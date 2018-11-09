@@ -17,11 +17,6 @@ inline class Sam(val value: String)
 inline class Id(val value: String)
 
 /**
- * Date, backed by iso format
- */
-inline class DateTime(val date: String)
-
-/**
  * Unique flag per category.
  * This is intentionally not an enum because implementations
  * should be able to have their own flags.

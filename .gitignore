@@ -4,6 +4,7 @@
 .gradle/
 /build
 /local.properties
+**/out/
 
 # Compiled class file
 *.class

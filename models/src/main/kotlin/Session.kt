@@ -1,3 +1,5 @@
+import java.util.*
+
 /**
  * Association between a user and a token (id).
  * Each session is also associated with a role.
@@ -9,6 +11,6 @@ data class Session(
         val user: User,
         val id: Id,
         val role: String,
-        val createdAt: DateTime,
-        val expiresAt: DateTime
+        val createdAt: Date,
+        val expiresAt: Date
 )

@@ -1,14 +1,16 @@
+import java.util.*
+
 data class PrintJobJson(
         val flag: String,
         val id: Id,
         val user: User,
-        val createdAt: DateTime? = null,
+        val createdAt: Date? = null,
         val filePath: String? = null,
-        val processedAt: DateTime? = null,
+        val processedAt: Date? = null,
         val pageCount: Int = 0,
         val colorPageCount: Int = 0,
         val printerGroup: String? = null,
-        val finishedAt: DateTime? = null,
+        val finishedAt: Date? = null,
         val errorFlag: String? = null
 ) {
     /**
@@ -81,7 +83,7 @@ sealed class PrintJob {
 data class CreatedJob(
         override val id: Id,
         override val user: User,
-        val createdAt: DateTime
+        val createdAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             PrintJob.CREATED,
@@ -93,9 +95,9 @@ data class CreatedJob(
 data class ProcessedJob(
         override val id: Id,
         override val user: User,
-        val createdAt: DateTime,
+        val createdAt: Date,
         val filePath: String,
-        val processedAt: DateTime,
+        val processedAt: Date,
         val pageCount: Int,
         val colorPageCount: Int
 ) : PrintJob() {
@@ -113,13 +115,13 @@ data class ProcessedJob(
 data class PrintedJob(
         override val id: Id,
         override val user: User,
-        val createdAt: DateTime,
+        val createdAt: Date,
         val filePath: String?,
-        val processedAt: DateTime,
+        val processedAt: Date,
         val pageCount: Int,
         val colorPageCount: Int,
         val printerGroup: String,
-        val finishedAt: DateTime
+        val finishedAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             PrintJob.PRINTED,
@@ -138,7 +140,7 @@ data class FailedJob(
         override val id: Id,
         override val user: User,
         val errorFlag: String,
-        val finishedAt: DateTime
+        val finishedAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             PrintJob.FAILED,
@@ -157,6 +159,6 @@ data class FailedJob(
 data class PrintRefund(
         val id: Id,
         val refunder: User,
-        val date: DateTime,
+        val date: Date,
         val refund: Boolean
 )

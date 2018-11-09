@@ -1,3 +1,5 @@
+import java.util.*
+
 data class PrinterGroup(
         val id: Id,
         val name: String,
@@ -31,7 +33,7 @@ data class PrinterStatus(
         val id: Id,
         val user: User,
         val flag: Flag,
-        val date: DateTime
+        val date: Date
 )
 
 /**
