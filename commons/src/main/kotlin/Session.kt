@@ -1,5 +1,14 @@
+/**
+ * Association between a user and a token (id).
+ * Each session is also associated with a role.
+ * For safety, we will always require an expiration date,
+ * which will be the latest time we will accept the session
+ * during purges.
+ */
 data class Session(
         val user: User,
         val id: Id,
-        val role: String
+        val role: String,
+        val createdAt: DateTime,
+        val expiresAt: DateTime
 )

@@ -148,6 +148,12 @@ data class FailedJob(
             finishedAt = finishedAt)
 }
 
+/**
+ * Model showing specific state of a print job.
+ * A print job is expected to have a history of refunds,
+ * with the most recent one reflecting its actual state.
+ * If no refunds are found, then the job has never been refunded.
+ */
 data class PrintRefund(
         val id: Id,
         val refunder: User,

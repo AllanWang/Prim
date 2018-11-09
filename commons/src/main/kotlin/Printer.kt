@@ -25,6 +25,7 @@ data class Printer(
  * Model showing a specific state of a given printer
  * It is expected that the associated printer will have a history of states,
  * and that the most recent one will reflect its current state.
+ * If no state is found, the printer is expected to be disabled.
  */
 data class PrinterStatus(
         val id: Id,
