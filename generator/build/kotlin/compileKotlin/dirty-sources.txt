@@ -1,1 +1,0 @@
-/Users/allanwang/PA/Prim/buildSrc/src/main/kotlin/ca/allanwang/prim/generator/ConfigGenerator.kt
