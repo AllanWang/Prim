@@ -1,3 +1,5 @@
+package ca.allanwang.ktor.models
+
 import java.util.*
 
 /**

@@ -1,3 +1,5 @@
+package ca.allanwang.ktor.models
+
 import java.util.*
 
 data class PrintJobJson(
@@ -86,7 +88,7 @@ data class CreatedJob(
         val createdAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
-            PrintJob.CREATED,
+            CREATED,
             id,
             user,
             createdAt = createdAt)
@@ -102,7 +104,7 @@ data class ProcessedJob(
         val colorPageCount: Int
 ) : PrintJob() {
     override fun json() = PrintJobJson(
-            PrintJob.PROCESSED,
+            PROCESSED,
             id,
             user,
             createdAt = createdAt,
@@ -124,7 +126,7 @@ data class PrintedJob(
         val finishedAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
-            PrintJob.PRINTED,
+            PRINTED,
             id,
             user,
             createdAt = createdAt,
@@ -143,7 +145,7 @@ data class FailedJob(
         val finishedAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
-            PrintJob.FAILED,
+            FAILED,
             id,
             user,
             errorFlag = errorFlag,

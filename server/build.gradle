@@ -1,12 +1,13 @@
-repositories {
-    jcenter()
-    maven { url "https://dl.bintray.com/kotlin/ktor" }
-}
-
 dependencies {
     compile project(":models")
+
+//    kapt project(":generator")
+//    compileOnly project(":generator")
+
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "io.ktor:ktor-jackson:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
+
+    compile "org.koin:koin-ktor:$koin_version"
 }

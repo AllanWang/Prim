@@ -1,3 +1,5 @@
+package ca.allanwang.ktor.models
+
 /**
  * General response for executing requests
  */
@@ -14,3 +16,4 @@ data class ErrorResponse(
         val flag: Flag,
         val extras: List<String> = emptyList()
 )
+

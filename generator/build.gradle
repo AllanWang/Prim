@@ -1,0 +1,7 @@
+apply plugin: 'java-gradle-plugin'
+
+dependencies {
+    compileOnly gradleApi()
+    testCompileOnly gradleTestKit()
+    compile "com.squareup:kotlinpoet:1.0.0-RC2"
+}

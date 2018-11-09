@@ -1,3 +1,5 @@
+package ca.allanwang.ktor.models
+
 /**
  * Unique identifier for any user
  */
