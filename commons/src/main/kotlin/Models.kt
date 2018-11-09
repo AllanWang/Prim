@@ -1,1 +1,0 @@
-data class Test(val a: String)
