@@ -1,0 +1,5 @@
+dependencies {
+    compile project(":models")
+
+    compile "org.koin:koin-ktor:$koin_version"
+}

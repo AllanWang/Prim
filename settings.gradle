@@ -1,5 +1,5 @@
 rootProject.name = 'prim'
 
-include 'generator', 'models', 'server'
+include 'generator', 'models', 'printer', 'server'
 
 //project(':gradle-plugin').projectDir = file("buildSrc")
