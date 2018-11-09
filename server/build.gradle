@@ -3,11 +3,23 @@ plugins {
 }
 repositories {
     mavenCentral()
+    maven { url "https://dl.bintray.com/kotlin/ktor" }
+}
+
+ext {
+    ktor_version = '1.0.0-beta-3'
+    logback_version = '1.2.3'
+    coroutines_version = '1.0.1'
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     expectedBy project(":commons")
+    compile "io.ktor:ktor-server-core:$ktor_version"
+    compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "ch.qos.logback:logback-classic:$logback_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+
     testCompile "junit:junit:4.12"
     testCompile "org.jetbrains.kotlin:kotlin-test"
     testCompile "org.jetbrains.kotlin:kotlin-test-junit"
