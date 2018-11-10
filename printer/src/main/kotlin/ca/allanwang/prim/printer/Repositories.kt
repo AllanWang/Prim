@@ -1,27 +1,61 @@
 package ca.allanwang.prim.printer
 
-import ca.allanwang.ktor.models.Id
-import ca.allanwang.ktor.models.Session
-import ca.allanwang.ktor.models.User
+import ca.allanwang.ktor.models.*
 
+/**
+ * Basic repository interface, where we can get and delete items
+ */
 interface Repository<M : Any> {
 
     fun getById(id: Id): M?
 
-    fun deleteById(id: Id): Boolean
+    fun deleteById(id: Id)
+
+    fun getList(limit: Int = -1, offset: Int = 0): List<M>
 
 }
 
-interface MutationRepository<M : Any> {
+/**
+ * Repository with a default list output, without conditions.
+ * Such lists can also be ordered.
+ */
+interface OrderedListRepository<M : Any> {
 
-    fun save(model: M): Boolean
+    fun getList(limit: Int = -1, offset: Int = 0, order: Order): List<M>
 
 }
 
-interface SessionRepository : Repository<Session>, MutationRepository<Session> {
+enum class Order {
+    ASCENDING, DESCENDING
+}
+
+interface SessionRepository :
+        Repository<Session> {
+
+    fun create(user: User, role: String): Session
 
     fun deleteByUser(user: User)
 
-    fun deleteExpired(): Boolean
+    fun deleteExpired()
+
+}
+
+interface PrinterRepository :
+        Repository<Printer> {
+
+    fun create(name: String, group: PrinterGroup): Printer
+
+    /**
+     * Get a list of printers from the given group
+     */
+    fun getList(group: PrinterGroup): List<Printer>
+
+}
+
+interface PrinterGroupRepository :
+        Repository<PrinterGroup> {
+
+    fun create(name: String, queueManager: Flag): PrinterGroup
+
 
 }

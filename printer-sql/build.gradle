@@ -1,0 +1,8 @@
+dependencies {
+    compile project(":models")
+    compile project(":printer")
+
+    compile "org.koin:koin-ktor:$koin_version"
+    compile "org.jetbrains.exposed:exposed:$exposed_version"
+
+}

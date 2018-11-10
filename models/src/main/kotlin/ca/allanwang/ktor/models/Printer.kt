@@ -10,20 +10,18 @@ data class PrinterGroup(
 
 /**
  * Representation of a printer.
- * Name is the human readable version, and should typically also be unique.
+ * [name] is the human readable version, and should typically also be unique.
+ * [user], [flag], and [message] are from the last associated [PrinterStatus]
  */
 data class Printer(
         val id: Id,
         val name: String,
         val groupId: Id,
-        val flag: Flag
-) {
-    companion object {
-        const val FLAG_ENABLED = "enabled"
-        const val FLAG_DISABLED = "disabled"
-        const val FLAG_OFFICE_ONLY = "office_only"
-    }
-}
+        val flag: Flag,
+        val date: Date,
+        val user: User?,
+        val message: String?
+)
 
 /**
  * Model showing a specific state of a given printer
@@ -35,15 +33,11 @@ data class PrinterStatus(
         val id: Id,
         val user: User,
         val flag: Flag,
-        val date: Date
-)
-
-/**
- * Association between a printer status flag and its message.
- * The flag is typically much smaller, and may not be a full sentence.
- * This also allows us to modify the description of an error without affecting previous states.
- */
-data class PrinterStatusMessage(
-        val flag: Flag,
+        val date: Date,
         val message: String
-)
+) {
+    companion object {
+        const val FLAG_ENABLED = "enabled"
+        const val FLAG_DISABLED = "disabled"
+    }
+}
