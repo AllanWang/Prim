@@ -2,11 +2,25 @@ package ca.allanwang.prim.printer.sql.repos
 
 import ca.allanwang.ktor.models.*
 import ca.allanwang.prim.printer.PrinterRepository
-import ca.allanwang.prim.printer.sql.newId
+import ca.allanwang.prim.printer.sql.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 import java.util.Date
+
+object PrinterTable : Table() {
+    val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
+    val name = varchar("name", NAME_SIZE).uniqueIndex()
+    val group = varchar("group", ID_SIZE)
+}
+
+object PrinterStatusTable : Table() {
+    val id = varchar("id", ID_SIZE).primaryKey(0).references(PrinterTable.id, ReferenceOption.CASCADE)
+    val date = datetime("date").primaryKey(1).clientDefault(DateTime::now)
+    val user = varchar("user", USER_SIZE)
+    val flag = varchar("flag", FLAG_SIZE)
+    val message = varchar("message", MESSAGE_SIZE)
+}
 
 internal class PrinterRepositorySql : PrinterRepository {
 
@@ -79,18 +93,4 @@ internal class PrinterRepositorySql : PrinterRepository {
         getById(Id(id!!))!!
     }
 
-}
-
-object PrinterTable : Table() {
-    val id = varchar("id", 255).primaryKey().clientDefault(::newId)
-    val name = varchar("name", 32).uniqueIndex()
-    val group = varchar("group", 64)
-}
-
-object PrinterStatusTable : Table() {
-    val id = varchar("id", 255).primaryKey(0).references(PrinterTable.id, ReferenceOption.CASCADE)
-    val date = datetime("date").primaryKey(1).clientDefault(DateTime::now)
-    val user = varchar("user", 64)
-    val flag = varchar("flag", 32)
-    val message = varchar("message", 255)
 }

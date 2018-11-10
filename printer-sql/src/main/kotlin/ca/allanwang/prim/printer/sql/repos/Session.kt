@@ -4,11 +4,21 @@ import ca.allanwang.ktor.models.Id
 import ca.allanwang.ktor.models.Session
 import ca.allanwang.ktor.models.User
 import ca.allanwang.prim.printer.SessionRepository
+import ca.allanwang.prim.printer.sql.FLAG_SIZE
+import ca.allanwang.prim.printer.sql.ID_SIZE
+import ca.allanwang.prim.printer.sql.USER_SIZE
 import ca.allanwang.prim.printer.sql.newId
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
+object SessionTable : Table() {
+    val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
+    val user = varchar("user", USER_SIZE).uniqueIndex()
+    val role = varchar("role", FLAG_SIZE)
+    val createdAt = datetime("created_at").clientDefault(DateTime::now)
+    val expiresAt = datetime("expires_at")
+}
 
 class SessionRepositorySql : SessionRepository {
 
@@ -48,12 +58,4 @@ class SessionRepositorySql : SessionRepository {
         SessionTable.deleteWhere { SessionTable.expiresAt lessEq DateTime.now() } != 0
     }
 
-}
-
-object SessionTable : Table() {
-    val id = varchar("id", 255).primaryKey().clientDefault(::newId)
-    val user = varchar("user", 64).uniqueIndex()
-    val role = varchar("role", 64)
-    val createdAt = datetime("created_at").clientDefault(DateTime::now)
-    val expiresAt = datetime("expires_at")
 }
