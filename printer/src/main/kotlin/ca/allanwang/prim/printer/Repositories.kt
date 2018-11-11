@@ -1,6 +1,7 @@
 package ca.allanwang.prim.printer
 
 import ca.allanwang.ktor.models.*
+import ca.allanwang.prim.models.*
 
 /**
  * Basic repository interface, where we can get and delete items

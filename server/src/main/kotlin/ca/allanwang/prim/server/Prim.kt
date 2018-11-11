@@ -1,6 +1,6 @@
 package ca.allanwang.prim.server
 
-import ca.allanwang.ktor.models.About
+import ca.allanwang.prim.models.About
 import ca.allanwang.prim.server.routes.root
 import io.ktor.application.Application
 import io.ktor.application.install

@@ -1,4 +1,4 @@
-package ca.allanwang.prim.sql
+package ca.allanwang.prim.printer.sql
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction

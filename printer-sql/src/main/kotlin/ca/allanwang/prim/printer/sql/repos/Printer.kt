@@ -1,6 +1,7 @@
 package ca.allanwang.prim.printer.sql.repos
 
 import ca.allanwang.ktor.models.*
+import ca.allanwang.prim.models.*
 import ca.allanwang.prim.printer.PrinterRepository
 import ca.allanwang.prim.printer.sql.*
 import org.jetbrains.exposed.sql.*

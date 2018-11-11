@@ -1,8 +1,8 @@
 package ca.allanwang.prim.printer.sql.repos
 
-import ca.allanwang.ktor.models.Id
-import ca.allanwang.ktor.models.Session
-import ca.allanwang.ktor.models.User
+import ca.allanwang.prim.models.Id
+import ca.allanwang.prim.models.Session
+import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
 import ca.allanwang.prim.printer.sql.FLAG_SIZE
 import ca.allanwang.prim.printer.sql.ID_SIZE

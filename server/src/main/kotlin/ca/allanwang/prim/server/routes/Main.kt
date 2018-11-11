@@ -1,6 +1,6 @@
 package ca.allanwang.prim.server.routes
 
-import ca.allanwang.ktor.models.About
+import ca.allanwang.prim.models.About
 import io.ktor.application.call
 import io.ktor.response.respond
 import io.ktor.response.respondText

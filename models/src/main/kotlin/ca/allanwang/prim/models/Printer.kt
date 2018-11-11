@@ -1,4 +1,4 @@
-package ca.allanwang.ktor.models
+package ca.allanwang.prim.models
 
 import java.util.*
 

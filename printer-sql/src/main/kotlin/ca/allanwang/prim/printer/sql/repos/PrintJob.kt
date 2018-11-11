@@ -1,6 +1,6 @@
 package ca.allanwang.prim.printer.sql.repos
 
-import ca.allanwang.ktor.models.PrintJob
+import ca.allanwang.prim.models.PrintJob
 import ca.allanwang.prim.printer.sql.*
 import org.jetbrains.exposed.sql.Table
 import org.joda.time.DateTime

@@ -1,10 +1,10 @@
-package ca.allanwang.prim.sql.repos
+package ca.allanwang.prim.printer.sql.repos
 
-import ca.allanwang.ktor.models.User
+import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
 import ca.allanwang.prim.printer.sql.repos.SessionTable
 import ca.allanwang.prim.printer.sql.sqlRepositoryModule
-import ca.allanwang.prim.sql.withTables
+import ca.allanwang.prim.printer.sql.withTables
 import org.jetbrains.exposed.sql.selectAll
 import org.junit.After
 import org.junit.Before

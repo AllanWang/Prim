@@ -1,7 +1,7 @@
 package ca.allanwang.prim.printer
 
-import ca.allanwang.ktor.models.Printer
-import ca.allanwang.ktor.models.PrinterStatus
+import ca.allanwang.prim.models.Printer
+import ca.allanwang.prim.models.PrinterStatus
 
 interface PrinterConfiguration {
 
