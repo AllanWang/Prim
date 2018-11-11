@@ -1,6 +1,5 @@
 package ca.allanwang.prim.models
 
-import ca.allanwang.ktor.models.*
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertEquals

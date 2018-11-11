@@ -1,6 +1,5 @@
 package ca.allanwang.prim.printer
 
-import ca.allanwang.ktor.models.*
 import ca.allanwang.prim.models.*
 
 /**
@@ -40,7 +39,7 @@ interface SessionRepository :
      * [expiresIn] is the time in ms for which the session will remain valid
      * Any expiration duration under 0 will go to a default value
      */
-    fun create(user: User, role: String, expiresIn: Long = -1): Session
+    fun create(user: User, role: String, expiresIn: Long = -1): Session?
 
     fun deleteByUser(user: User)
 
@@ -51,7 +50,7 @@ interface SessionRepository :
 interface PrinterRepository :
         Repository<Printer> {
 
-    fun create(name: String, group: PrinterGroup): Printer
+    fun create(name: String, group: PrinterGroup): Printer?
 
     /**
      * Get a list of printers from the given group
@@ -63,7 +62,18 @@ interface PrinterRepository :
 interface PrinterGroupRepository :
         Repository<PrinterGroup> {
 
-    fun create(name: String, queueManager: Flag): PrinterGroup
+    fun create(name: String, queueManager: Flag): PrinterGroup?
 
+    /**
+     * Retrieves a map of every printer group to its associated printers.
+     * Note that if a printer has no associated group, it will not be shown here.
+     */
+    fun getAllPrinters(): Map<PrinterGroup, List<Printer>>
+
+    /**
+     * Given a group id, attempt to get the associated group
+     * and its printers
+     */
+    fun getPrinter(group: Id): Pair<PrinterGroup, List<Printer>>?
 
 }
