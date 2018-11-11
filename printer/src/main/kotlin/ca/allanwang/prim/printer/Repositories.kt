@@ -36,8 +36,10 @@ interface SessionRepository :
      * Creates a new session for the user and role
      * This should automatically invalidate all preexisting sessions
      * with a different role
+     * [expiresIn] is the time in ms for which the session will remain valid
+     * Any expiration duration under 0 will go to a default value
      */
-    fun create(user: User, role: String): Session
+    fun create(user: User, role: String, expiresIn: Long = -1): Session
 
     fun deleteByUser(user: User)
 

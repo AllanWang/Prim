@@ -20,6 +20,8 @@ object SessionTable : Table() {
     val expiresAt = datetime("expires_at")
 }
 
+private const val DEFAULT_EXPIRATION_DURATION = 1000 * 60 * 60 * 24 * 30L // a month
+
 class SessionRepositorySql : SessionRepository {
 
     private fun ResultRow.toSession(): Session = Session(
@@ -42,11 +44,12 @@ class SessionRepositorySql : SessionRepository {
         SessionTable.selectAll().limit(limit, offset = offset).map { it.toSession() }.toList()
     }
 
-    override fun create(user: User, role: String): Session = transaction {
+    override fun create(user: User, role: String, expiresIn: Long): Session = transaction {
         SessionTable.deleteWhere { (SessionTable.user eq user.value) and (SessionTable.role neq role) }
         val id = SessionTable.insert {
             it[SessionTable.user] = user.value
             it[SessionTable.role] = role
+            it[SessionTable.expiresAt] = DateTime.now().plus(if (expiresIn > 0) expiresIn else DEFAULT_EXPIRATION_DURATION)
         } get SessionTable.id
         getById(Id(id!!))!!
     }
