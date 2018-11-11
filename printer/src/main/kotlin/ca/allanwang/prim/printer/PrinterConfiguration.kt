@@ -23,6 +23,6 @@ interface PrinterConfiguration {
 class DefaultPrinterConfiguration : PrinterConfiguration {
 
     override fun getCandidatePrinters(role: String, printers: List<Printer>): List<Printer> =
-            printers.filter { it.flag.flag == PrinterStatus.FLAG_ENABLED }
+            printers.filter { it.flag == PrinterStatus.FLAG_ENABLED }
 
 }

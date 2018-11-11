@@ -6,7 +6,6 @@ import ca.allanwang.prim.printer.sql.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
-import java.util.Date
 
 object PrinterTable : Table() {
     val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
@@ -24,47 +23,22 @@ object PrinterStatusTable : Table() {
 
 internal class PrinterRepositorySql : PrinterRepository {
 
-    private fun ResultRow.toPrinter(): Printer = Printer(
-            id = Id(this[PrinterTable.id]),
+    private fun ResultRow.toPrinter(): Printer = PrinterJson(
+            id = this[PrinterTable.id],
             name = this[PrinterTable.name],
-            groupId = Id(this[PrinterTable.group]),
-            flag = Flag(PrinterStatus.FLAG_DISABLED),
-            user = null,
-            date = Date(),
-            message = null
-    )
-
-    private fun ResultRow.toPrinterStatus(): PrinterStatus = PrinterStatus(
-            id = Id(this[PrinterStatusTable.id]),
-            user = User(this[PrinterStatusTable.user]),
-            flag = Flag(this[PrinterStatusTable.flag]),
-            date = this[PrinterStatusTable.date].toDate(),
-            message = this[PrinterStatusTable.message]
-    )
+            groupId = this[PrinterTable.group],
+            flag = tryGet(PrinterStatusTable.flag) ?: PrinterStatus.FLAG_DISABLED,
+            statusUser = tryGet(PrinterStatusTable.user),
+            statusDate = tryGet(PrinterStatusTable.date)?.toDate(),
+            statusMessage = tryGet(PrinterStatusTable.message)
+    ).specific()
 
     override fun getById(id: Id): Printer? = transaction {
 
-        val printer = PrinterTable.select {
-            PrinterTable.id eq id.value
-        }.firstOrNull()
-                ?.toPrinter()
-                ?: return@transaction null
-
-        // If no status found, return current printer model
-        val status = PrinterStatusTable.select {
-            (PrinterStatusTable.id eq id.value)
-        }.orderBy(PrinterStatusTable.date, false)
-                .limit(1)
+        (PrinterTable leftJoin PrinterStatusTable)
+                .select { PrinterTable.id eq id.value }
                 .firstOrNull()
-                ?.toPrinterStatus()
-                ?: return@transaction printer
-
-        printer.copy(
-                user = status.user,
-                flag = status.flag,
-                date = status.date,
-                message = status.message
-        )
+                ?.toPrinter()
 
     }
 
@@ -73,15 +47,15 @@ internal class PrinterRepositorySql : PrinterRepository {
     }
 
     override fun getList(limit: Int, offset: Int): List<Printer> = transaction {
-        // TODO optimize list retrieval
-        PrinterTable.selectAll()
-                .mapNotNull { getById(Id(it[PrinterTable.id])) }
+        (PrinterTable leftJoin PrinterStatusTable)
+                .selectAll()
+                .map { it.toPrinter() }
     }
 
     override fun getList(group: PrinterGroup): List<Printer> = transaction {
-        // TODO optimize list retrieval
-        PrinterTable.select { PrinterTable.group eq group.id.value }
-                .mapNotNull { getById(Id(it[PrinterTable.id])) }
+        (PrinterTable leftJoin PrinterStatusTable)
+                .select { PrinterTable.group eq group.id.value }
+                .map { it.toPrinter() }
     }
 
     override fun create(name: String, group: PrinterGroup): Printer = transaction {

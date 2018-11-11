@@ -14,7 +14,7 @@ import org.joda.time.DateTime
 
 object SessionTable : Table() {
     val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
-    val user = varchar("user", USER_SIZE).uniqueIndex()
+    val user = varchar("user", USER_SIZE)
     val role = varchar("role", FLAG_SIZE)
     val createdAt = datetime("created_at").clientDefault(DateTime::now)
     val expiresAt = datetime("expires_at")
@@ -35,7 +35,7 @@ class SessionRepositorySql : SessionRepository {
     }
 
     override fun deleteById(id: Id): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.id eq id.value } != 0
+        SessionTable.deleteWhere { SessionTable.id eq id.value }
     }
 
     override fun getList(limit: Int, offset: Int): List<Session> = transaction {
@@ -43,6 +43,7 @@ class SessionRepositorySql : SessionRepository {
     }
 
     override fun create(user: User, role: String): Session = transaction {
+        SessionTable.deleteWhere { (SessionTable.user eq user.value) and (SessionTable.role neq role) }
         val id = SessionTable.insert {
             it[SessionTable.user] = user.value
             it[SessionTable.role] = role
@@ -51,11 +52,11 @@ class SessionRepositorySql : SessionRepository {
     }
 
     override fun deleteByUser(user: User): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.user eq user.value } != 0
+        SessionTable.deleteWhere { SessionTable.user eq user.value }
     }
 
     override fun deleteExpired(): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.expiresAt lessEq DateTime.now() } != 0
+        SessionTable.deleteWhere { SessionTable.expiresAt lessEq DateTime.now() }
     }
 
 }

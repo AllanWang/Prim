@@ -4,8 +4,8 @@ import java.util.*
 
 data class PrintJobJson(
         val flag: String,
-        val id: Id,
-        val user: User,
+        val id: String,
+        val user: String,
         val createdAt: Date? = null,
         val filePath: String? = null,
         val processedAt: Date? = null,
@@ -13,21 +13,24 @@ data class PrintJobJson(
         val colorPageCount: Int = 0,
         val printerGroup: String? = null,
         val finishedAt: Date? = null,
-        val errorFlag: String? = null
-) {
+        val errorFlag: String? = null,
+        val refunded: Boolean = false,
+        val refunder: User? = null,
+        val refundDate: Date? = null
+) : JsonModel<PrintJob> {
     /**
      * Converts json model to one of the sealed [PrintJob] classes.
      * Opposite of [PrintJob.json]
      */
-    fun specific(): PrintJob = when (flag) {
+    override fun specific(): PrintJob = when (flag) {
         PrintJob.CREATED -> CreatedJob(
-                id = id,
-                user = user,
+                id = Id(id),
+                user = User(user),
                 createdAt = createdAt!!
         )
         PrintJob.PROCESSED -> ProcessedJob(
-                id = id,
-                user = user,
+                id = Id(id),
+                user = User(user),
                 createdAt = createdAt!!,
                 filePath = filePath!!,
                 processedAt = processedAt!!,
@@ -35,19 +38,25 @@ data class PrintJobJson(
                 colorPageCount = colorPageCount
         )
         PrintJob.PRINTED -> PrintedJob(
-                id = id,
-                user = user,
+                id = Id(id),
+                user = User(user),
                 createdAt = createdAt!!,
                 filePath = filePath!!,
                 processedAt = processedAt!!,
                 pageCount = pageCount,
                 colorPageCount = colorPageCount,
                 printerGroup = printerGroup!!,
-                finishedAt = finishedAt!!
+                finishedAt = finishedAt!!,
+                refund = if (refunder != null
+                        && refundDate != null)
+                    PrintRefund(
+                            refunder = refunder,
+                            date = refundDate
+                    ) else null
         )
         PrintJob.FAILED -> FailedJob(
-                id = id,
-                user = user,
+                id = Id(id),
+                user = User(user),
                 errorFlag = errorFlag!!,
                 finishedAt = finishedAt!!
         )
@@ -64,15 +73,9 @@ data class PrintJobJson(
  *
  * In a given lifecycle, a print job is expected to eventually end up as printed or failed
  */
-sealed class PrintJob {
+sealed class PrintJob : SpecificModel<PrintJobJson> {
     abstract val id: Id
     abstract val user: User
-
-    /**
-     * Converts sealed printjob to a json model.
-     * Opposite of [PrintJobJson.specific]
-     */
-    abstract fun json(): PrintJobJson
 
     companion object {
         const val CREATED = "created"
@@ -89,8 +92,8 @@ data class CreatedJob(
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             CREATED,
-            id,
-            user,
+            id.value,
+            user.value,
             createdAt = createdAt)
 }
 
@@ -105,8 +108,8 @@ data class ProcessedJob(
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             PROCESSED,
-            id,
-            user,
+            id.value,
+            user.value,
             createdAt = createdAt,
             filePath = filePath,
             processedAt = processedAt,
@@ -123,19 +126,26 @@ data class PrintedJob(
         val pageCount: Int,
         val colorPageCount: Int,
         val printerGroup: String,
-        val finishedAt: Date
+        val finishedAt: Date,
+        val refund: PrintRefund?
 ) : PrintJob() {
+
+    val isRefunded: Boolean get() = refund != null
+
     override fun json() = PrintJobJson(
             PRINTED,
-            id,
-            user,
+            id.value,
+            user.value,
             createdAt = createdAt,
             filePath = filePath,
             processedAt = processedAt,
             pageCount = pageCount,
             colorPageCount = colorPageCount,
             printerGroup = printerGroup,
-            finishedAt = finishedAt)
+            finishedAt = finishedAt,
+            refunded = isRefunded,
+            refunder = refund?.refunder,
+            refundDate = refund?.date)
 }
 
 data class FailedJob(
@@ -146,21 +156,18 @@ data class FailedJob(
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             FAILED,
-            id,
-            user,
+            id.value,
+            user.value,
             errorFlag = errorFlag,
             finishedAt = finishedAt)
 }
 
 /**
- * Model showing specific state of a print job.
- * A print job is expected to have a history of refunds,
- * with the most recent one reflecting its actual state.
- * If no refunds are found, then the job has never been refunded.
+ * Model for print job refunds
+ * A print job will have at most one associated refund.
+ * If none exist, it is not refunded.
  */
 data class PrintRefund(
-        val id: Id,
         val refunder: User,
-        val date: Date,
-        val refund: Boolean
+        val date: Date
 )

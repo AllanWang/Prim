@@ -32,6 +32,11 @@ enum class Order {
 interface SessionRepository :
         Repository<Session> {
 
+    /**
+     * Creates a new session for the user and role
+     * This should automatically invalidate all preexisting sessions
+     * with a different role
+     */
     fun create(user: User, role: String): Session
 
     fun deleteByUser(user: User)
