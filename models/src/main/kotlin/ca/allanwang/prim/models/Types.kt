@@ -3,20 +3,12 @@ package ca.allanwang.prim.models
 /**
  * Unique identifier for any user
  */
-inline class User(val value: String) {
-    val sam get() = Sam(value)
-}
-
-/**
- * Ldap type; general identifier for a user.
- * Unique per user, but must be converted before used as a key
- */
-inline class Sam(val value: String)
+typealias User = String
 
 /**
  * Unique id for various models
  */
-inline class Id(val value: String)
+typealias Id = String
 
 /**
  * Unique flag per category.
@@ -27,4 +19,4 @@ inline class Id(val value: String)
  *
  * TODO check if necessary; effectively same as [Id]
  */
-inline class Flag(val flag: String)
+typealias Flag = String
