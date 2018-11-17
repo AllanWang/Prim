@@ -22,9 +22,37 @@ subprojects {
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib"
 
-        testCompile "junit:junit:4.12"
+        testCompile "org.junit.jupiter:junit-jupiter-api:${junit_version}"
+        testCompile "org.junit.jupiter:junit-jupiter-params:${junit_version}"
+        testRuntime "org.junit.jupiter:junit-jupiter-engine:${junit_version}"
+
         testCompile "org.jetbrains.kotlin:kotlin-test"
-        testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+        testCompile "org.jetbrains.kotlin:kotlin-test-junit5"
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+
+    def kotlinResolutions = ['kotlin-reflect',
+                             'kotlin-stdlib',
+                             'kotlin-stdlib-jdk7',
+                             'kotlin-stdlib-jdk8',
+                             'kotlin-test',
+                             'kotlin-test-junit4',
+                             'kotlin-test-junit5']
+
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == 'org.jetbrains.kotlin' && requested.name in kotlinResolutions) {
+                details.useVersion kotlin_version
+            }
+        }
     }
 
     compileKotlin {

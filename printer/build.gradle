@@ -2,4 +2,22 @@ dependencies {
     compile project(":models")
 
     compile "org.koin:koin-ktor:$koin_version"
+    testCompile("org.koin:koin-test:$koin_version") {
+        exclude group: 'junit', module: 'junit'
+    }
+}
+
+configurations {
+    testClasses {
+        extendsFrom(testRuntime)
+    }
+}
+
+task testJar(type: Jar) {
+    classifier = 'test'
+    from sourceSets.test.output
+}
+
+artifacts {
+    testClasses testJar
 }

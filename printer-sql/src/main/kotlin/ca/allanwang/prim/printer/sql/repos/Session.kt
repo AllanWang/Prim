@@ -12,7 +12,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
-object SessionTable : Table() {
+object SessionTable : Table("session") {
     val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
     val user = varchar("user", USER_SIZE)
     val role = varchar("role", FLAG_SIZE)
@@ -60,6 +60,10 @@ internal object SessionRepositorySql : SessionRepository {
 
     override fun deleteExpired(): Unit = transaction {
         SessionTable.deleteWhere { SessionTable.expiresAt lessEq DateTime.now() }
+    }
+
+    override fun count(): Int = transaction {
+        SessionTable.selectAll().count()
     }
 
 }

@@ -1,11 +1,14 @@
 package ca.allanwang.prim.printer.sql.repos
 
 import ca.allanwang.prim.models.PrintJob
-import ca.allanwang.prim.printer.sql.*
+import ca.allanwang.prim.printer.sql.FLAG_SIZE
+import ca.allanwang.prim.printer.sql.ID_SIZE
+import ca.allanwang.prim.printer.sql.USER_SIZE
+import ca.allanwang.prim.printer.sql.newId
 import org.jetbrains.exposed.sql.Table
 import org.joda.time.DateTime
 
-object PrintJobTable : Table() {
+object PrintJobTable : Table("print_job") {
     val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
     val flag = varchar("flag", FLAG_SIZE).default(PrintJob.CREATED)
     val user = varchar("user", USER_SIZE).uniqueIndex()

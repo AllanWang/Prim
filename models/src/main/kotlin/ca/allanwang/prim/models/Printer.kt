@@ -35,7 +35,7 @@ data class Printer(
         val name: String,
         val groupId: Id,
         val status: PrinterStatus?
-): SpecificModel<PrinterJson> {
+) : SpecificModel<PrinterJson> {
 
     val flag: String get() = status?.flag?.flag ?: PrinterStatus.FLAG_DISABLED
 
