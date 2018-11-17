@@ -8,13 +8,13 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
-object PrinterTable : Table() {
+object PrinterTable : Table("printer") {
     val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
     val name = varchar("name", NAME_SIZE).uniqueIndex()
     val group = varchar("group", ID_SIZE)
 }
 
-object PrinterStatusTable : Table() {
+object PrinterStatusTable : Table("printer_status") {
     val id = varchar("id", ID_SIZE).primaryKey(0).references(PrinterTable.id, ReferenceOption.CASCADE)
     val date = datetime("date").primaryKey(1).clientDefault(DateTime::now)
     val user = varchar("user", USER_SIZE)
@@ -22,7 +22,7 @@ object PrinterStatusTable : Table() {
     val message = varchar("message", MESSAGE_SIZE)
 }
 
-object PrinterGroupTable : Table() {
+object PrinterGroupTable : Table("printer_group") {
     val id = varchar("id", ID_SIZE).primaryKey()
     val name = varchar("name", NAME_SIZE).uniqueIndex()
     val queueManager = varchar("queue_manager", FLAG_SIZE)
@@ -74,6 +74,9 @@ internal object PrinterRepositorySql : PrinterRepository {
         getById(Id(id))
     }
 
+    override fun count(): Int = transaction {
+        PrinterTable.selectAll().count()
+    }
 }
 
 internal object PrinterGroupRepositorySql : PrinterGroupRepository {
@@ -117,6 +120,10 @@ internal object PrinterGroupRepositorySql : PrinterGroupRepository {
         val printerGroup = getById(group) ?: return@transaction null
         val printers = PrinterRepositorySql.getList(printerGroup)
         printerGroup to printers
+    }
+
+    override fun count(): Int = transaction {
+        PrinterGroupTable.selectAll().count()
     }
 
 }

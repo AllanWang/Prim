@@ -13,6 +13,8 @@ interface Repository<M : Any> {
 
     fun getList(limit: Int = -1, offset: Int = 0): List<M>
 
+    fun count(): Int
+
 }
 
 /**

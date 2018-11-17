@@ -22,9 +22,19 @@ subprojects {
     dependencies {
         compile "org.jetbrains.kotlin:kotlin-stdlib"
 
-        testCompile "junit:junit:4.12"
+        testCompile "org.junit.jupiter:junit-jupiter-api:${junit_version}"
+        testCompile "org.junit.jupiter:junit-jupiter-params:${junit_version}"
+        testRuntime "org.junit.jupiter:junit-jupiter-engine:${junit_version}"
+
         testCompile "org.jetbrains.kotlin:kotlin-test"
-        testCompile "org.jetbrains.kotlin:kotlin-test-junit"
+        testCompile "org.jetbrains.kotlin:kotlin-test-junit5"
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
     }
 
     compileKotlin {

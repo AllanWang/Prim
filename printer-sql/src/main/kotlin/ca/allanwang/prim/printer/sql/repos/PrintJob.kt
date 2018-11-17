@@ -5,7 +5,7 @@ import ca.allanwang.prim.printer.sql.*
 import org.jetbrains.exposed.sql.Table
 import org.joda.time.DateTime
 
-object PrintJobTable : Table() {
+object PrintJobTable : Table("print_job") {
     val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
     val flag = varchar("flag", FLAG_SIZE).default(PrintJob.CREATED)
     val user = varchar("user", USER_SIZE).uniqueIndex()
