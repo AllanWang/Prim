@@ -37,6 +37,15 @@ subprojects {
         }
     }
 
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion kotlin_version
+            }
+        }
+    }
+
     compileKotlin {
         kotlinOptions.jvmTarget = jvm_target
         kotlinOptions.freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
