@@ -5,10 +5,14 @@ import ca.allanwang.prim.printer.SessionRepository
 import org.koin.standalone.inject
 import kotlin.test.*
 
+/**
+ * Base test suite for session related components
+ * Required koins:
+ * - [SessionRepository]
+ */
 abstract class SessionTestBase : TestBase() {
 
     val sessionRepository: SessionRepository by inject()
-
 
     fun createSession(key: Int = 0,
                       user: String = "testUser$key",

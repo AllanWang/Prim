@@ -1,4 +1,4 @@
 dependencies {
 //    compile "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
-    testCompile "org.jetbrains.kotlin:kotlin-reflect"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
