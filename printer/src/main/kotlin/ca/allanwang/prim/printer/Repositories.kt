@@ -66,8 +66,14 @@ interface SessionRepository :
      */
     fun create(user: User, role: String, expiresIn: Long = -1): Session?
 
+    /**
+     * Deletes session by unique user key.
+     */
     fun deleteByUser(user: User)
 
+    /**
+     * Deletes session if expiration date has already passed.
+     */
     fun deleteExpired()
 
 }
@@ -75,6 +81,9 @@ interface SessionRepository :
 interface PrinterRepository :
         Repository<Printer> {
 
+    /**
+     * Creates a new printer with the provided [name] and [group].
+     */
     fun create(name: String, group: PrinterGroup): Printer?
 
     /**
@@ -87,6 +96,10 @@ interface PrinterRepository :
 interface PrinterGroupRepository :
         Repository<PrinterGroup> {
 
+    /**
+     * Creates a new printer group with the provided [name]
+     * and [queueManager]
+     */
     fun create(name: String, queueManager: Flag): PrinterGroup?
 
     /**
