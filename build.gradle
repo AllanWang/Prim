@@ -37,10 +37,16 @@ subprojects {
         }
     }
 
+
+    def kotlinResolutions = ['kotlin-reflect',
+                             'kotlin-stdlib',
+                             'kotlin-stdlib-jdk7',
+                             'kotlin-stdlib-jdk8']
+
     configurations.all {
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             def requested = details.requested
-            if (requested.group == 'org.jetbrains.kotlin') {
+            if (requested.group == 'org.jetbrains.kotlin' && requested.name in kotlinResolutions) {
                 details.useVersion kotlin_version
             }
         }
