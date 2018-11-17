@@ -27,7 +27,6 @@ abstract class SessionTestBase : TestBase() {
         assertEquals(session, sessionRepository.getById(session.id))
     }
 
-    @Ignore
     @Test
     fun `create should delete invalid sessions`() {
         val testUser = "testUser"
@@ -43,7 +42,6 @@ abstract class SessionTestBase : TestBase() {
                 "Session invalidation removed a session from a different user")
     }
 
-    @Ignore
     @Test
     fun `negative expiresIn should have positive default`() {
         val session = createSession(expiresIn = -1)!!

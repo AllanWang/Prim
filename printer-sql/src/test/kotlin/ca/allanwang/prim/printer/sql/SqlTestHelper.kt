@@ -13,14 +13,18 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.koin.dsl.module.Module
 import org.koin.standalone.StandAloneContext.startKoin
 
-open class TableExtension(tables: List<Table>,
-                          private val modules: List<Module>,
-                          private val debug: Boolean = false)
+/**
+ * Extension that binds additional koin modules and sql tables for each test.
+ * All sql tables are dropped with each test.
+ */
+open class SqlExtension(tables: List<Table>,
+                        private val modules: List<Module>,
+                        private val debug: Boolean = false)
     : BeforeEachCallback, BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
     private val tables = tables.toTypedArray()
 
-    override fun beforeEach(context: ExtensionContext?) {
+    override fun beforeEach(context: ExtensionContext) {
         println("BeforeAA")
         startKoin(modules)
     }
@@ -29,7 +33,7 @@ open class TableExtension(tables: List<Table>,
         println("BeforeEx")
         Database.connect("jdbc:h2:mem:test;MODE=MySQL", "org.h2.Driver", "test", "test")
         transaction {
-            debug = this@TableExtension.debug
+            debug = this@SqlExtension.debug
             SchemaUtils.create(*tables)
             println("Initialized 1 ${SessionTable.selectAll().count()}")
         }
