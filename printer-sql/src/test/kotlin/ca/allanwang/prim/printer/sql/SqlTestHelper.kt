@@ -37,10 +37,10 @@ open class SqlExtension(tables: List<Table>,
             SchemaUtils.create(*tables)
             println("Initialized 1 ${SessionTable.selectAll().count()}")
         }
-        transaction {
-            println("Test 2")
-            println("Initialized 2 ${SessionTable.selectAll().count()}")
-        }
+//        transaction {
+//            println("Test 2")
+//            println("Initialized 2 ${SessionTable.selectAll().count()}")
+//        }
     }
 
     override fun afterTestExecution(context: ExtensionContext) = transaction {
