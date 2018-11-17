@@ -43,14 +43,14 @@ internal object PrinterRepositorySql : PrinterRepository {
     override fun getById(id: Id): Printer? = transaction {
 
         (PrinterTable leftJoin PrinterStatusTable)
-                .select { PrinterTable.id eq id.value }
+                .select { PrinterTable.id eq id }
                 .firstOrNull()
                 ?.toPrinter()
 
     }
 
     override fun deleteById(id: Id): Unit = transaction {
-        PrinterTable.deleteWhere { PrinterTable.id eq id.value }
+        PrinterTable.deleteWhere { PrinterTable.id eq id }
     }
 
     override fun getList(limit: Int, offset: Int): List<Printer> = transaction {
@@ -61,17 +61,17 @@ internal object PrinterRepositorySql : PrinterRepository {
 
     override fun getList(group: PrinterGroup): List<Printer> = transaction {
         (PrinterTable leftJoin PrinterStatusTable)
-                .select { PrinterTable.group eq group.id.value }
+                .select { PrinterTable.group eq group.id }
                 .map { it.toPrinter() }
     }
 
     override fun create(name: String, group: PrinterGroup): Printer? = transaction {
         val id = PrinterTable.insert {
             it[PrinterTable.name] = name
-            it[PrinterTable.group] = group.id.value
+            it[PrinterTable.group] = group.id
         } get PrinterTable.id ?: return@transaction null
 
-        getById(Id(id))
+        getById(id)
     }
 
     override fun count(): Int = transaction {
@@ -82,21 +82,21 @@ internal object PrinterRepositorySql : PrinterRepository {
 internal object PrinterGroupRepositorySql : PrinterGroupRepository {
 
     private fun ResultRow.toPrinterGroup(): PrinterGroup = PrinterGroup(
-            id = Id(this[PrinterGroupTable.id]),
+            id = this[PrinterGroupTable.id],
             name = this[PrinterGroupTable.name],
-            queueManager = Flag(this[PrinterGroupTable.queueManager]))
+            queueManager = this[PrinterGroupTable.queueManager])
 
 
     override fun getById(id: Id): PrinterGroup? = transaction {
 
-        PrinterGroupTable.select { PrinterTable.id eq id.value }
+        PrinterGroupTable.select { PrinterTable.id eq id }
                 .firstOrNull()
                 ?.toPrinterGroup()
 
     }
 
     override fun deleteById(id: Id): Unit = transaction {
-        PrinterGroupTable.deleteWhere { PrinterGroupTable.id eq id.value }
+        PrinterGroupTable.deleteWhere { PrinterGroupTable.id eq id }
     }
 
     override fun getList(limit: Int, offset: Int): List<PrinterGroup> = transaction {
@@ -106,10 +106,10 @@ internal object PrinterGroupRepositorySql : PrinterGroupRepository {
     override fun create(name: String, queueManager: Flag): PrinterGroup? = transaction {
         val id = PrinterGroupTable.insert {
             it[PrinterGroupTable.name] = name
-            it[PrinterGroupTable.queueManager] = queueManager.flag
+            it[PrinterGroupTable.queueManager] = queueManager
         } get PrinterGroupTable.id ?: return@transaction null
 
-        getById(Id(id))
+        getById(id)
     }
 
     override fun getAllPrinters(): Map<PrinterGroup, List<Printer>> = transaction {

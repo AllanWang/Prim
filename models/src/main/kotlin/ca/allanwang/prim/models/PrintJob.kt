@@ -24,13 +24,13 @@ data class PrintJobJson(
      */
     override fun specific(): PrintJob = when (flag) {
         PrintJob.CREATED -> CreatedJob(
-                id = Id(id),
-                user = User(user),
+                id = id,
+                user = user,
                 createdAt = createdAt!!
         )
         PrintJob.PROCESSED -> ProcessedJob(
-                id = Id(id),
-                user = User(user),
+                id = id,
+                user = user,
                 createdAt = createdAt!!,
                 filePath = filePath!!,
                 processedAt = processedAt!!,
@@ -38,8 +38,8 @@ data class PrintJobJson(
                 colorPageCount = colorPageCount
         )
         PrintJob.PRINTED -> PrintedJob(
-                id = Id(id),
-                user = User(user),
+                id = id,
+                user = user,
                 createdAt = createdAt!!,
                 filePath = filePath!!,
                 processedAt = processedAt!!,
@@ -55,8 +55,8 @@ data class PrintJobJson(
                     ) else null
         )
         PrintJob.FAILED -> FailedJob(
-                id = Id(id),
-                user = User(user),
+                id = id,
+                user = user,
                 errorFlag = errorFlag!!,
                 finishedAt = finishedAt!!
         )
@@ -92,8 +92,8 @@ data class CreatedJob(
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             CREATED,
-            id.value,
-            user.value,
+            id,
+            user,
             createdAt = createdAt)
 }
 
@@ -108,8 +108,8 @@ data class ProcessedJob(
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             PROCESSED,
-            id.value,
-            user.value,
+            id,
+            user,
             createdAt = createdAt,
             filePath = filePath,
             processedAt = processedAt,
@@ -134,8 +134,8 @@ data class PrintedJob(
 
     override fun json() = PrintJobJson(
             PRINTED,
-            id.value,
-            user.value,
+            id,
+            user,
             createdAt = createdAt,
             filePath = filePath,
             processedAt = processedAt,
@@ -156,8 +156,8 @@ data class FailedJob(
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             FAILED,
-            id.value,
-            user.value,
+            id,
+            user,
             errorFlag = errorFlag,
             finishedAt = finishedAt)
 }
