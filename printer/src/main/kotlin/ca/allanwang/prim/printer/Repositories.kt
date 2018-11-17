@@ -7,12 +7,31 @@ import ca.allanwang.prim.models.*
  */
 interface Repository<M : Any> {
 
+    /**
+     * Gets a single item by its unique id.
+     * Returns null if no item is found.
+     */
     fun getById(id: Id): M?
 
+    /**
+     * Deletes a single item by its unique id.
+     * If the item is not found, then nothing happens.
+     */
     fun deleteById(id: Id)
 
+    /**
+     * Returns a list of items without any particular order.
+     * Note that if the parameters are not modified, the full
+     * list of items should be returned.
+     * [limit] specifies the upper bound for the number of items to return when it is positive.
+     * [offset] specifies the start index of the returned list relative to the full list;
+     * this is useful for pagination.
+     */
     fun getList(limit: Int = -1, offset: Int = 0): List<M>
 
+    /**
+     * Returns the number of items in the entire repository.
+     */
     fun count(): Int
 
 }
@@ -23,6 +42,10 @@ interface Repository<M : Any> {
  */
 interface OrderedListRepository<M : Any> {
 
+    /**
+     * Similar to [Repository.getList], though there is an additional order constraint.
+     * What the order means is dependent on the implementation.
+     */
     fun getList(limit: Int = -1, offset: Int = 0, order: Order): List<M>
 
 }

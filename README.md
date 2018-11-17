@@ -2,6 +2,9 @@
 
 Un service d'impression en Kotlin
 
+[![Build Status](https://api.travis-ci.com/AllanWang/Prim.svg?branch=master)](https://travis-ci.cim/AllanWang/Prim)
+[![GitHub license](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://raw.githubusercontent.com/AllanWang/Prim/master/LICENSE)
+
 ## Submodules
 
 ### [Models](models#readme)
