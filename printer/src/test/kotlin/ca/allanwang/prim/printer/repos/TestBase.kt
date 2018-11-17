@@ -1,7 +1,5 @@
 package ca.allanwang.prim.printer.repos
 
-import org.junit.Before
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.AfterEachCallback
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.ExtensionContext
