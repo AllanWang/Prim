@@ -12,16 +12,16 @@ data class PrinterJson(
         val statusMessage: String? = null
 ) : JsonModel<Printer> {
     override fun specific(): Printer = Printer(
-            id = Id(id),
+            id = id,
             name = name,
-            groupId = Id(groupId),
+            groupId = groupId,
             status = if (statusUser != null
                     && statusMessage != null
                     && statusDate != null)
-                PrinterStatus(user = User(statusUser),
+                PrinterStatus(user = statusUser,
                         message = statusMessage,
                         date = statusDate,
-                        flag = Flag(flag)
+                        flag = flag
                 ) else null
     )
 }
@@ -37,15 +37,15 @@ data class Printer(
         val status: PrinterStatus?
 ) : SpecificModel<PrinterJson> {
 
-    val flag: String get() = status?.flag?.flag ?: PrinterStatus.FLAG_DISABLED
+    val flag: String get() = status?.flag ?: PrinterStatus.FLAG_DISABLED
 
     override fun json(): PrinterJson = PrinterJson(
-            id = id.value,
+            id = id,
             name = name,
-            groupId = groupId.value,
+            groupId = groupId,
             flag = flag,
             statusDate = status?.date,
-            statusUser = status?.user?.value,
+            statusUser = status?.user,
             statusMessage = status?.message
     )
 }

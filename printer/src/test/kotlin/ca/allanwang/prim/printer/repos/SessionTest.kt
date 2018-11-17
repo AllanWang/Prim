@@ -18,14 +18,14 @@ abstract class SessionTestBase : TestBase() {
                       user: String = "testUser$key",
                       role: String = "testRole$key",
                       expiresIn: Long = 1000000) =
-            sessionRepository.create(user = User(user), role = role, expiresIn = expiresIn)
+            sessionRepository.create(user = user, role = role, expiresIn = expiresIn)
 
 
     @Test
     fun `create and get`() {
         println("Create and get")
         val session = createSession(0)!!
-        assertEquals("testUser0", session.user.value)
+        assertEquals("testUser0", session.user)
         assertEquals("testRole0", session.role)
 
         assertEquals(session, sessionRepository.getById(session.id))

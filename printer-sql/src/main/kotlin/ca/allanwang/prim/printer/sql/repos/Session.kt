@@ -25,19 +25,19 @@ private const val DEFAULT_EXPIRATION_DURATION = 1000 * 60 * 60 * 24 * 30L // a m
 internal object SessionRepositorySql : SessionRepository {
 
     private fun ResultRow.toSession(): Session = Session(
-            id = Id(this[SessionTable.id]),
-            user = User(this[SessionTable.user]),
+            id = this[SessionTable.id],
+            user = this[SessionTable.user],
             role = this[SessionTable.role],
             createdAt = this[SessionTable.createdAt].toDate(),
             expiresAt = this[SessionTable.expiresAt].toDate()
     )
 
     override fun getById(id: Id): Session? = transaction {
-        SessionTable.select { SessionTable.id eq id.value }.firstOrNull()?.toSession()
+        SessionTable.select { SessionTable.id eq id }.firstOrNull()?.toSession()
     }
 
     override fun deleteById(id: Id): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.id eq id.value }
+        SessionTable.deleteWhere { SessionTable.id eq id }
     }
 
     override fun getList(limit: Int, offset: Int): List<Session> = transaction {
@@ -45,17 +45,17 @@ internal object SessionRepositorySql : SessionRepository {
     }
 
     override fun create(user: User, role: String, expiresIn: Long): Session? = transaction {
-        SessionTable.deleteWhere { (SessionTable.user eq user.value) and (SessionTable.role neq role) }
+        SessionTable.deleteWhere { (SessionTable.user eq user) and (SessionTable.role neq role) }
         val id = SessionTable.insert {
-            it[SessionTable.user] = user.value
+            it[SessionTable.user] = user
             it[SessionTable.role] = role
             it[SessionTable.expiresAt] = DateTime.now().plus(if (expiresIn > 0) expiresIn else DEFAULT_EXPIRATION_DURATION)
         } get SessionTable.id ?: return@transaction null
-        getById(Id(id))
+        getById(id)
     }
 
     override fun deleteByUser(user: User): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.user eq user.value }
+        SessionTable.deleteWhere { SessionTable.user eq user }
     }
 
     override fun deleteExpired(): Unit = transaction {
