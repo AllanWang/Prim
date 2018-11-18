@@ -43,6 +43,7 @@ internal object PrinterRepositorySql : PrinterRepository,
             statusMessage = tryGet(PrinterStatusTable.message)
     ).specific()
 
+    // TODO allow for multiple statuses and get the latest one only
     override fun retrieverFields(): FieldSet = table leftJoin PrinterStatusTable
 
     override fun getList(group: PrinterGroup): List<Printer> = transaction {
@@ -94,7 +95,7 @@ internal object PrinterGroupRepositorySql : PrinterGroupRepository,
         groups.map { it to (printers[it.id] ?: emptyList()) }.toMap()
     }
 
-    override fun getPrinter(group: Id): Pair<PrinterGroup, List<Printer>>? = transaction {
+    override fun getPrinters(group: Id): Pair<PrinterGroup, List<Printer>>? = transaction {
         val printerGroup = getById(group) ?: return@transaction null
         val printers = PrinterRepositorySql.getList(printerGroup)
         printerGroup to printers

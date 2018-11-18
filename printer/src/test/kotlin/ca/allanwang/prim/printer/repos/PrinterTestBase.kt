@@ -47,12 +47,12 @@ abstract class PrinterTestBase : TestBase() {
     @Test
     fun `basic group creation`() {
         val group = createPrinterGroup(0)!!
-        val groupFromDb = printerGroupRepository.getPrinter(group.id)!!
+        val groupFromDb = printerGroupRepository.getPrinters(group.id)!!
         assertTrue(groupFromDb.second.isEmpty(),
                 "New printer group should have empty printer list")
         assertEquals(group, groupFromDb.first,
                 "Printer retrieved from db does not match original")
-        assertNull(printerGroupRepository.getPrinter(
+        assertNull(printerGroupRepository.getPrinters(
                 "invalidGroup"), "Printer with different group should return null")
     }
 
@@ -72,8 +72,8 @@ abstract class PrinterTestBase : TestBase() {
         val printer01 = createPrinter(1, group0)!!
         val printer12 = createPrinter(2, group1)!!
 
-        val groupDb0 = printerGroupRepository.getPrinter(group0.id)
-        val groupDb1 = printerGroupRepository.getPrinter(group1.id)
+        val groupDb0 = printerGroupRepository.getPrinters(group0.id)
+        val groupDb1 = printerGroupRepository.getPrinters(group1.id)
         assertPrinterGroupsEqual(group0 to listOf(printer00, printer01), groupDb0)
         assertPrinterGroupsEqual(group1 to listOf(printer12), groupDb1)
 

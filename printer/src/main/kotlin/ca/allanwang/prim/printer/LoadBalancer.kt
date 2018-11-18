@@ -1,5 +1,7 @@
 package ca.allanwang.prim.printer
 
+import ca.allanwang.prim.models.Flag
+import ca.allanwang.prim.models.Id
 import ca.allanwang.prim.models.PrintedJob
 import ca.allanwang.prim.models.ProcessedJob
 import java.util.concurrent.ConcurrentHashMap
@@ -8,21 +10,22 @@ import java.util.concurrent.atomic.AtomicReference
 interface LoadBalancer {
     /**
      * Given a collection of ids and a print request,
-     * select one of the ids
+     * select one of the ids.
      *
-     * Returned id should be one of the candidates
+     * Returned id should be one of the candidates.
      *
-     * By implementation, the list will have at least 2 candidates
-     * 0 candidates will lead to an automatic rejection,
-     * 1 candidate will lead to an automatic selection
+     * By implementation, the list will have at least 2 candidates;
+     * 0 candidates will lead to an automatic rejection, and
+     * 1 candidate will lead to an automatic selection.
      *
-     * Note that calls here should be idempotent
-     * Only when a job because a request that is passed through [register] should the load balancer change its state
+     * Note that calls here should be idempotent.
+     * Only when a job because a request that is passed through [register] should the load balancer change its state.
+     * The candidates should also be ordered, in that the same set of candidates should always have the same list.
      */
-    fun select(candidates: List<String>, candidate: ProcessedJob): String
+    fun select(candidates: List<Id>, candidate: ProcessedJob): Id
 
     /**
-     * Makes not of a printed job
+     * Makes note of a printed job
      */
     fun register(request: PrintedJob)
 
@@ -34,7 +37,7 @@ interface LoadBalancer {
         /**
          * Get one of the packaged load balancers by key
          */
-        fun fromName(name: String): LoadBalancer? = when (name) {
+        fun fromName(name: Flag): LoadBalancer? = when (name) {
             DEFAULT -> RoundRobin()
             ROUND_ROBIN -> RoundRobin()
             SHORTEST_WAIT -> ShortestWait()
@@ -45,16 +48,16 @@ interface LoadBalancer {
 }
 
 /**
- * Loops through candidates by index to assign the next job
- * No consideration is done with regards to the actual job or page count
+ * Loops through candidates by index to assign the next job.
+ * No consideration is done with regards to the actual job or page count.
  *
- * If the old index cannot be found, it starts back at candidate 0
+ * If the old index cannot be found, it starts back at candidate 0.
  */
 class RoundRobin : LoadBalancer {
 
-    private val lastUsed = AtomicReference<String>("")
+    private val lastUsed = AtomicReference<Id>("")
 
-    override fun select(candidates: List<String>, candidate: ProcessedJob): String {
+    override fun select(candidates: List<Id>, candidate: ProcessedJob): Id {
         val oldIndex = candidates.indexOf(lastUsed.get()) // -1 if not found
         return candidates[(oldIndex + 1) % candidates.size]
     }
@@ -69,10 +72,10 @@ class RoundRobin : LoadBalancer {
  */
 class ShortestWait : LoadBalancer {
 
-    private val endTimes: MutableMap<String, Long> = ConcurrentHashMap()
+    private val endTimes: MutableMap<Id, Long> = ConcurrentHashMap()
 
     // Gets candidate with the lowest logged end time
-    override fun select(candidates: List<String>, candidate: ProcessedJob): String =
+    override fun select(candidates: List<Id>, candidate: ProcessedJob): Id =
             candidates.minBy { endTimes.getOrDefault(it, 0L) }!!
 
     // Gets the old end time, which is either some time in the future or now,

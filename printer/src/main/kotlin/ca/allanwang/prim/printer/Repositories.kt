@@ -143,7 +143,7 @@ interface PrinterGroupRepository : Repository<Id, PrinterGroup> {
 
     /**
      * Creates a new printer group with the provided parameters.
-     * [id] is a unique identifier for the group
+     * [id] is a unique identifier for the group.
      * [name] is the unique display name for the printer.
      * [loadBalancer] is the name of the [LoadBalancer] to use.
      */
@@ -163,8 +163,8 @@ interface PrinterGroupRepository : Repository<Id, PrinterGroup> {
 
     /**
      * Given a group id, attempt to get the associated group
-     * and its printers
+     * and its printers.
      */
-    fun getPrinter(group: Id): Pair<PrinterGroup, List<Printer>>?
+    fun getPrinters(group: Id): Pair<PrinterGroup, List<Printer>>?
 
 }

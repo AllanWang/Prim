@@ -1,5 +1,6 @@
 package ca.allanwang.prim.printer
 
+import ca.allanwang.prim.models.Flag
 import ca.allanwang.prim.models.Printer
 import ca.allanwang.prim.models.PrinterStatus
 
@@ -18,6 +19,12 @@ interface PrinterConfiguration {
      */
     fun getCandidatePrinters(role: String, printers: List<Printer>): List<Printer>
 
+    /**
+     * Called to fetch a load balancer if the name is not recognized by the current implementations.
+     * Remember that this should return a new instance and not reuse an existing one.
+     */
+    fun createLoadBalancer(name: Flag): LoadBalancer
+
 }
 
 class DefaultPrinterConfiguration : PrinterConfiguration {
@@ -25,4 +32,5 @@ class DefaultPrinterConfiguration : PrinterConfiguration {
     override fun getCandidatePrinters(role: String, printers: List<Printer>): List<Printer> =
             printers.filter { it.flag == PrinterStatus.FLAG_ENABLED }
 
+    override fun createLoadBalancer(name: Flag): LoadBalancer = LoadBalancer.fromName(LoadBalancer.DEFAULT)!!
 }

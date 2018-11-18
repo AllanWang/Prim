@@ -56,6 +56,7 @@ internal object PrintJobRepositorySql : PrintJobRepository,
             refunder = tryGet(PrintJobRefundTable.refunder)
     ).specific()
 
+    // TODO allow for multiple refunds and get the latest one only
     override fun retrieverFields(): FieldSet = table leftJoin PrintJobRefundTable
 
     override fun create(user: User, printerGroup: Id): CreatedJob? = transactionInsert(newId()) {
@@ -99,7 +100,6 @@ internal object PrintJobRepositorySql : PrintJobRepository,
 
     override fun updateRefundStatus(id: Id, refunder: User, refund: Boolean): PrintedJob? = transaction {
         if (table.select { (table.id eq id) and (table.flag eq PrintJob.PRINTED) }.count() == 0) return@transaction null
-
         getById(id)
     } as PrintedJob?
 }
