@@ -41,6 +41,7 @@ open class SqlExtension(tables: List<Table>,
 
     override fun afterTestExecution(context: ExtensionContext) {
         val transaction = TransactionManager.currentOrNull() ?: fail("No transaction manager found after sql test")
+        SchemaUtils.drop(*tables)
         transaction.commit()
         TransactionManager.resetCurrent(TransactionManager.manager)
         transaction.currentStatement?.let {

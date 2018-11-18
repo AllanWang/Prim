@@ -6,6 +6,12 @@ package ca.allanwang.prim.models
 typealias User = String
 
 /**
+ * Human readable string.
+ * Typically unique per category.
+ */
+typealias Name = String
+
+/**
  * Unique id for various models
  */
 typealias Id = String
