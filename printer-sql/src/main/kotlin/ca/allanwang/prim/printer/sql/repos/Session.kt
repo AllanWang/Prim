@@ -5,7 +5,10 @@ import ca.allanwang.prim.models.Session
 import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
 import ca.allanwang.prim.printer.newId
-import ca.allanwang.prim.printer.sql.*
+import ca.allanwang.prim.printer.sql.FLAG_SIZE
+import ca.allanwang.prim.printer.sql.ID_SIZE
+import ca.allanwang.prim.printer.sql.SqlRepository
+import ca.allanwang.prim.printer.sql.USER_SIZE
 import org.jetbrains.exposed.dao.IdTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.and
@@ -36,7 +39,7 @@ internal object SessionRepositorySql : SessionRepository,
 
     override fun create(user: User, role: String, expiresIn: Long): Session? = transaction {
         table.deleteWhere { (table.user eq user) and (table.role neq role) }
-        transactionInsert {
+        transactionInsert(newId()) {
             it[table.user] = user
             it[table.role] = role
             it[table.expiresAt] = DateTime.now().plus(if (expiresIn > 0) expiresIn else DEFAULT_EXPIRATION_DURATION)

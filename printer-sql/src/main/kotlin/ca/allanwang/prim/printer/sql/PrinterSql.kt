@@ -60,16 +60,15 @@ abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val tab
         table.selectAll().count()
     }
 
-    protected fun transactionInsert(body: T.(InsertStatement<Number>) -> Unit): M? = transaction {
+    protected fun transactionInsert(id: K, body: T.(InsertStatement<Number>) -> Unit): M? = transaction {
         try {
-            println("Assert")
-            val ins = table.insert(body)
-            println("INserted ${getList()}")
-            val id = ins get table.id
-            val data = getById(id!!.value)
-            println("Data $data")
-            data
+            table.insert {
+                body(it)
+                it[table.id] = EntityID(id, table)
+            }
+            getById(id)
         } catch (e: Exception) {
+            // TODO remove
             println("Error $e")
             null
         }

@@ -51,8 +51,7 @@ internal object PrinterRepositorySql : PrinterRepository,
                 .map { it.rowToModel() }
     }
 
-    override fun create(id: Id, name: Name, group: PrinterGroup): Printer? = transactionInsert {
-        it[table.id] = EntityID(id, table)
+    override fun create(id: Id, name: Name, group: PrinterGroup): Printer? = transactionInsert(id) {
         it[table.name] = name
         it[table.group] = group.id
     }
@@ -70,8 +69,7 @@ internal object PrinterGroupRepositorySql : PrinterGroupRepository,
             name = this[table.name],
             queueManager = this[table.loadBalancer])
 
-    override fun create(id: Id, name: Name, loadBalancer: Flag): PrinterGroup? = transactionInsert {
-        it[table.id] = EntityID(id, table)
+    override fun create(id: Id, name: Name, loadBalancer: Flag): PrinterGroup? = transactionInsert(id) {
         it[table.name] = name
         it[table.loadBalancer] = loadBalancer
     }
