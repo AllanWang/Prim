@@ -10,7 +10,7 @@ import org.koin.standalone.inject
 import kotlin.test.*
 
 /**
- * Base test suite for session related components
+ * Base test suite for [Printer] and [PrinterGroup] related components
  * Required koins:
  * - [PrinterRepository]
  * - [PrinterGroupRepository]

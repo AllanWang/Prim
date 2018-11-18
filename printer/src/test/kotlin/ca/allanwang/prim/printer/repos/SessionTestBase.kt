@@ -1,11 +1,12 @@
 package ca.allanwang.prim.printer.repos
 
+import ca.allanwang.prim.models.Session
 import ca.allanwang.prim.printer.SessionRepository
 import org.koin.standalone.inject
 import kotlin.test.*
 
 /**
- * Base test suite for session related components
+ * Base test suite for [Session] related components
  * Required koins:
  * - [SessionRepository]
  */

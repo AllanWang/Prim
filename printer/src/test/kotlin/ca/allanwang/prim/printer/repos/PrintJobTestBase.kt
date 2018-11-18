@@ -2,15 +2,15 @@ package ca.allanwang.prim.printer.repos
 
 import ca.allanwang.prim.models.*
 import ca.allanwang.prim.printer.PrintJobRepository
-import kotlin.test.Test
 import org.koin.standalone.inject
 import java.util.*
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull
 
 /**
- * Base test suite for session related components
+ * Base test suite for [PrintJob] related components
  * Required koins:
  * - [PrintJobRepository]
  * - [PrintJobTestRepository]

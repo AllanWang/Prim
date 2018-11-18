@@ -12,8 +12,6 @@ import org.joda.time.DateTime
 import org.junit.jupiter.api.extension.ExtendWith
 import org.koin.dsl.module.module
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
 
 class PrintJobExtension : SqlExtension(
         tables = listOf(PrintJobTable, PrintJobRefundTable),
@@ -25,7 +23,7 @@ class PrintJobTest : PrintJobTestBase() {
 
     @Test
     fun blank() {
-        
+
     }
 
     /*
