@@ -1,9 +1,7 @@
 package ca.allanwang.prim.printer.sql
 
-import ca.allanwang.prim.printer.PrinterGroupRepository
-import ca.allanwang.prim.printer.PrinterRepository
-import ca.allanwang.prim.printer.Repository
-import ca.allanwang.prim.printer.SessionRepository
+import ca.allanwang.prim.printer.*
+import ca.allanwang.prim.printer.sql.repos.PrintJobRepositorySql
 import ca.allanwang.prim.printer.sql.repos.PrinterGroupRepositorySql
 import ca.allanwang.prim.printer.sql.repos.PrinterRepositorySql
 import ca.allanwang.prim.printer.sql.repos.SessionRepositorySql
@@ -20,6 +18,7 @@ import org.koin.dsl.module.module
  */
 val sqlRepositoryModule = module {
     single<SessionRepository> { SessionRepositorySql }
+    single<PrintJobRepository> { PrintJobRepositorySql }
     single<PrinterRepository> { PrinterRepositorySql }
     single<PrinterGroupRepository> { PrinterGroupRepositorySql }
 }
@@ -80,6 +79,7 @@ abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val tab
             getById(id)
         }
     } catch (e: Exception) {
+//        e.printStackTrace()
         null
     }
 

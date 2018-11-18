@@ -28,6 +28,7 @@ subprojects {
 
         testCompile "org.jetbrains.kotlin:kotlin-test"
         testCompile "org.jetbrains.kotlin:kotlin-test-junit5"
+        testCompile "org.jetbrains.kotlin:kotlin-reflect"
     }
 
     test {

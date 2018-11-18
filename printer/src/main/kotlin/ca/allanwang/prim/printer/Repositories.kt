@@ -75,14 +75,14 @@ interface PrintJobRepository : Repository<Id, PrintJob> {
     /**
      * Attempts to update a previously created job to the processed stage.
      * This state will attach all the necessary info about the job to prepare its print process.
-     * Note that this should only apply to a job that already exists and is in the [PrintJob.CREATED] phase
+     * Note that this should only apply to a job that already exists and is in the [PrintJob.CREATED] or [PrintJob.PROCESSED] phase
      */
     fun updateProcessed(id: Id, filePath: String, totalPageCount: Int, colorPageCount: Int): ProcessedJob?
 
     /**
      * Attempts to update a previously processed job to the printed stage.
      * This marks the job as complete, and will attach any remaining info.
-     * Note that this should only apply to a job that already exists and is in the [PrintJob.PROCESSED] phase.
+     * Note that this should only apply to a job that already exists and is in the [PrintJob.PROCESSED] or [PrintJob.PRINTED] phase.
      */
     fun updatePrinted(id: Id, printer: Id): PrintedJob?
 

@@ -9,10 +9,7 @@ import ca.allanwang.prim.printer.sql.ID_SIZE
 import ca.allanwang.prim.printer.sql.SqlRepository
 import ca.allanwang.prim.printer.sql.USER_SIZE
 import org.jetbrains.exposed.dao.IdTable
-import org.jetbrains.exposed.sql.FieldSet
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
@@ -38,7 +35,7 @@ object PrintJobRefundTable : IdTable<String>("print_job_refund") {
     val refund = bool("refund")
 }
 
-class PrintJobRepositorySql : PrintJobRepository,
+internal object PrintJobRepositorySql : PrintJobRepository,
         SqlRepository<Id, PrintJob, PrintJobTable>(PrintJobTable) {
 
     override fun ResultRow.rowToModel(): PrintJob = PrintJobJson(
@@ -51,9 +48,9 @@ class PrintJobRepositorySql : PrintJobRepository,
             createdAt = this[table.createdAt].toDate(),
             processedAt = this[table.processedAt]?.toDate(),
             finishedAt = this[table.finishedAt]?.toDate(),
-            errorFlag = this[table.user],
-            printer = this[table.user],
-            printerGroup = this[table.user],
+            errorFlag = this[table.errorFlag],
+            printer = this[table.printer],
+            printerGroup = this[table.printerGroup],
             refundDate = tryGet(PrintJobRefundTable.date)?.toDate(),
             refunded = tryGet(PrintJobRefundTable.refund) ?: false,
             refunder = tryGet(PrintJobRefundTable.refunder)
@@ -71,7 +68,7 @@ class PrintJobRepositorySql : PrintJobRepository,
                                  filePath: String,
                                  totalPageCount: Int,
                                  colorPageCount: Int): ProcessedJob? = transactionUpdate(id, {
-        (table.id eq id) and (table.flag eq PrintJob.CREATED)
+        (table.id eq id) and ((table.flag eq PrintJob.CREATED) or (table.flag eq PrintJob.PROCESSED))
     }) {
         it[this.flag] = PrintJob.PROCESSED
         it[this.processedAt] = DateTime.now()
@@ -81,7 +78,7 @@ class PrintJobRepositorySql : PrintJobRepository,
     } as ProcessedJob?
 
     override fun updatePrinted(id: Id, printer: Id): PrintedJob? = transactionUpdate(id, {
-        (table.id eq id) and (table.flag eq PrintJob.PROCESSED)
+        (table.id eq id) and ((table.flag eq PrintJob.PROCESSED) or (table.flag eq PrintJob.PRINTED))
     }) {
         it[this.flag] = PrintJob.PRINTED
         it[this.finishedAt] = DateTime.now()
