@@ -31,6 +31,10 @@ abstract class PrintJobTestBase : TestBase() {
         assertEquals(PrintJob.CREATED, job.flag)
     }
 
+    /**
+     * A series of tests to make sure that [PrintJobTestRepository.save]
+     * works as expected.
+     */
     @Test
     fun `test module check`() {
         val created = createPrintJob(0)!!
@@ -49,6 +53,10 @@ abstract class PrintJobTestBase : TestBase() {
                 "Failed job test save failed")
     }
 
+    /**
+     * [PrintJobRepository.updateProcessed] should affect jobs that are in the
+     * [PrintJob.CREATED] or [PrintJob.PROCESSED] stages, but not others.
+     */
     @Test
     fun `update processed`() {
         val job = createPrintJob(0)!!
@@ -76,6 +84,10 @@ abstract class PrintJobTestBase : TestBase() {
         }
     }
 
+    /**
+     * [PrintJobRepository.updatePrinted] should affect jobs that are in the
+     * [PrintJob.PROCESSED] or [PrintJob.PRINTED] stages, but not others.
+     */
     @Test
     fun `update printed`() {
         val job = createPrintJob(0)!!.toProcessed()
@@ -111,7 +123,8 @@ abstract class PrintJobTestBase : TestBase() {
 
     fun PrintJob.save() = printJobTestRepository.save(this)
 
-    fun PrintJob.fail(): FailedJob = json().copy(flag = PrintJob.FAILED,
+    fun PrintJob.fail(): FailedJob = json().copy(
+            flag = PrintJob.FAILED,
             errorFlag = "test_flag",
             finishedAt = Date()).specific() as FailedJob
 

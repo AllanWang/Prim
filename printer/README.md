@@ -12,3 +12,23 @@ and is therefore left to the implementor.
 They typically map to databases, though there is no further constraint beyond that the interfaces must be thread safe.
 Every repository has a way of adding and deleting an item by a key, and each has their own specific helper functions.
 Read the KDocs for more info.
+
+## Creating Repositories
+
+The repository interfaces can be found [here](https://github.com/AllanWang/Prim/blob/master/printer/src/main/kotlin/ca/allanwang/prim/printer/Repositories.kt).
+Simply implement each one and expose them to a koin module for others to use.
+Before using in production, make sure to test the implementations against the existing test suite, found [here](https://github.com/AllanWang/Prim/tree/master/printer/src/test/kotlin/ca/allanwang/prim/printer/repos).
+To use them, add the following dependency to your module's gradle file:
+
+```gradle
+dependencies {
+    ...
+    testCompile("ca.allanwang.prim:printer:$prim_version", configuration: 'testClasses')
+}
+```
+
+Next, extend any of the test suites and add junit extensions to inject the necessary koin modules.
+In some cases, you may need to make more repositories to expose more methods for the test methods.
+The benefit here is that all the main logic and tests are written for you. 
+You are free to add more tests in your own class on top of the existing ones.
+See the [sql tests](https://github.com/AllanWang/Prim/tree/master/printer-sql/src/test/kotlin/ca/allanwang/prim/printer/sql/repos) for an example.

@@ -23,11 +23,9 @@ abstract class SessionTestBase : TestBase() {
 
     @Test
     fun `create and get`() {
-        println("Create and get")
         val session = createSession(0)!!
         assertEquals("testUser0", session.user)
         assertEquals("testRole0", session.role)
-
         assertEquals(session, sessionRepository.getById(session.id))
     }
 
