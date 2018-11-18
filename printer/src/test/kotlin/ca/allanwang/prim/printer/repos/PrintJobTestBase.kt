@@ -22,8 +22,9 @@ abstract class PrintJobTestBase : TestBase() {
 
     fun createPrintJob(key: Int = 0,
                        user: User = "testUser$key",
+                       jobName: String = "job$key",
                        printGroup: Id = "testGroup$key") =
-            printJobRepository.create(user = user, printerGroup = printGroup)
+            printJobRepository.create(user = user, jobName = jobName, printerGroup = printGroup)
 
     @Test
     fun `basic creation`() {
@@ -39,18 +40,18 @@ abstract class PrintJobTestBase : TestBase() {
     fun `test module check`() {
         val created = createPrintJob(0)!!
         val id = created.id
-        val processed = created.toProcessed()
-        processed.save()
-        assertEquals(processed, printJobRepository.getById(id),
-                "Processed job test save failed")
-        val printed = processed.toPrinted()
-        printed.save()
-        assertEquals(printed, printJobRepository.getById(id),
-                "Printed job test save failed")
-        val failed = printed.fail()
-        failed.save()
-        assertEquals(failed, printJobRepository.getById(id),
-                "Failed job test save failed")
+
+        fun <T : PrintJob> T.assertSave(): T {
+            val tag = this::class.simpleName
+            save()
+            assertEquals(this, printJobRepository.getById(id),
+                    "$tag test save failed")
+            return this
+        }
+
+        created.toProcessed().assertSave()
+                .toPrinted().assertSave()
+                .fail().assertSave()
     }
 
     /**
@@ -132,6 +133,7 @@ abstract class PrintJobTestBase : TestBase() {
             id = id,
             user = user,
             createdAt = createdAt,
+            jobName = jobName,
             printerGroup = printerGroup,
             colorPageCount = 5,
             totalPageCount = 15,
@@ -143,6 +145,7 @@ abstract class PrintJobTestBase : TestBase() {
             id = id,
             user = user,
             createdAt = createdAt,
+            jobName = jobName,
             printerGroup = printerGroup,
             colorPageCount = colorPageCount,
             totalPageCount = totalPageCount,

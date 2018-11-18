@@ -5,6 +5,8 @@ package ca.allanwang.prim.models
  */
 typealias User = String
 
+typealias Role = String
+
 /**
  * Human readable string.
  * Typically unique per category.

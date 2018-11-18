@@ -1,6 +1,8 @@
 package ca.allanwang.prim.printer.repos
 
+import ca.allanwang.prim.models.Role
 import ca.allanwang.prim.models.Session
+import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
 import org.koin.standalone.inject
 import kotlin.test.*
@@ -15,8 +17,8 @@ abstract class SessionTestBase : TestBase() {
     val sessionRepository: SessionRepository by inject()
 
     fun createSession(key: Int = 0,
-                      user: String = "testUser$key",
-                      role: String = "testRole$key",
+                      user: User = "testUser$key",
+                      role: Role = "testRole$key",
                       expiresIn: Long = 1000000) =
             sessionRepository.create(user = user, role = role, expiresIn = expiresIn)
 

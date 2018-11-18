@@ -35,22 +35,26 @@ class JsonSpecificConversionTest {
         CreatedJob(
                 id = "testId",
                 user = "testUser",
-                createdAt = Date(1),
-                printerGroup = "group").verify()
+                jobName = "job",
+                printerGroup = "group",
+                createdAt = Date(1)).verify()
 
         ProcessedJob(
                 id = "testId",
                 user = "testUser",
+                jobName = "job",
+                printerGroup = "group",
                 createdAt = Date(1),
                 totalPageCount = 1,
                 colorPageCount = 2,
                 filePath = "filePath",
-                processedAt = Date(5),
-                printerGroup = "group").verify()
+                processedAt = Date(5)).verify()
 
         val printed = PrintedJob(
                 id = "testId",
                 user = "testUser",
+                jobName = "job",
+                printerGroup = "group",
                 createdAt = Date(1),
                 totalPageCount = 1,
                 colorPageCount = 2,
@@ -58,7 +62,6 @@ class JsonSpecificConversionTest {
                 processedAt = Date(5),
                 refund = null,
                 finishedAt = Date(7),
-                printerGroup = "group",
                 printer = "printer")
 
         printed.verify()
@@ -70,6 +73,8 @@ class JsonSpecificConversionTest {
         FailedJob(
                 id = "testId",
                 user = "testUser",
+                jobName = "job",
+                printerGroup = "group",
                 finishedAt = Date(1),
                 errorFlag = "error",
                 printer = "printer").verify()

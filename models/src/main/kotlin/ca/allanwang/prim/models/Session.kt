@@ -12,7 +12,7 @@ import java.util.*
 data class Session(
         val user: User,
         val id: Id,
-        val role: String,
+        val role: Role,
         val createdAt: Date,
         val expiresAt: Date
 )

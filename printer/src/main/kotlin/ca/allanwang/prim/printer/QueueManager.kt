@@ -1,39 +1,43 @@
 package ca.allanwang.prim.printer
 
-import ca.allanwang.prim.models.Id
-import ca.allanwang.prim.models.PrintedJob
-import ca.allanwang.prim.models.ProcessedJob
-import ca.allanwang.prim.models.Session
+import ca.allanwang.prim.models.*
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
-import java.util.concurrent.ConcurrentHashMap
 
 object QueueManager : KoinComponent {
 
-    val printerGroupRepository: PrinterGroupRepository by inject()
-    val printerConfigs: PrinterConfiguration by inject()
+    private val printerGroupRepository: PrinterGroupRepository by inject()
+    private val printerConfigs: PrinterConfiguration by inject()
 
-    private val loadBalancers: MutableMap<Id, LoadBalancer> = ConcurrentHashMap()
+    private val loadBalancers: MutableMap<Id, LoadBalancer> = mutableMapOf()
 
-    // TODO make thread safe
-    private fun loadBalancer(group: Id): LoadBalancer = loadBalancers.getOrElse(group) {
-        val loadBalancer = LoadBalancer.fromName(group) ?: printerConfigs.createLoadBalancer(group)
-        loadBalancers[group] = loadBalancer
-        loadBalancer
+    @Synchronized
+    private fun loadBalancer(group: Id): LoadBalancer = loadBalancers.getOrPut(group) {
+        LoadBalancer.fromName(group) ?: printerConfigs.createLoadBalancer(group)
+    }
+
+    /**
+     * Just checks if there are potentially printers available for the given group and role.
+     * Note that no consideration is made in regards to the print job.
+     * If the job is processed, use [getPrinter]
+     */
+    fun hasPrinters(group: Id, role: Role): Boolean {
+        val groupInfo = printerGroupRepository.getPrinters(group) ?: return false
+        return printerConfigs.getCandidatePrinters(role, groupInfo.second).isNotEmpty()
     }
 
     /**
      * Pure function to retrieve a destination printer.
      * Returns null if no suitable printer exists.
      */
-    fun getPrinter(group: Id, session: Session, printJob: ProcessedJob): Id? {
+    fun getPrinter(group: Id, role: Role, printJob: ProcessedJob): Id? {
         val groupInfo = printerGroupRepository.getPrinters(group) ?: return null
         val printers = groupInfo.second
         return when (printers.size) {
             0 -> null
             1 -> printers.first().id
             else -> {
-                val candidates = printerConfigs.getCandidatePrinters(session.role, printers)
+                val candidates = printerConfigs.getCandidatePrinters(role, printers)
                 loadBalancer(groupInfo.first.loadBalancer)
                         .select(candidates.map { it.id }.sorted(), printJob)
             }

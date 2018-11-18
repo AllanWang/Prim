@@ -3,11 +3,11 @@ package ca.allanwang.prim.models
 import java.util.*
 
 data class PrinterJson(
-        val id: String,
-        val name: String,
-        val groupId: String,
-        val flag: String,
-        val statusUser: String? = null,
+        val id: Id,
+        val name: Name,
+        val groupId: Id,
+        val flag: Flag,
+        val statusUser: User? = null,
         val statusDate: Date? = null,
         val statusMessage: String? = null
 ) : JsonModel<Printer> {
@@ -32,12 +32,12 @@ data class PrinterJson(
  */
 data class Printer(
         val id: Id,
-        val name: String,
+        val name: Name,
         val groupId: Id,
         val status: PrinterStatus?
 ) : SpecificModel<PrinterJson> {
 
-    val flag: String get() = status?.flag ?: PrinterStatus.FLAG_DISABLED
+    val flag: Flag get() = status?.flag ?: PrinterStatus.FLAG_DISABLED
 
     override fun json(): PrinterJson = PrinterJson(
             id = id,
@@ -70,6 +70,6 @@ data class PrinterStatus(
 
 data class PrinterGroup(
         val id: Id,
-        val name: String,
+        val name: Name,
         val loadBalancer: Flag
 )

@@ -49,7 +49,7 @@ interface SessionRepository : Repository<Id, Session> {
      * [expiresIn] is the time in ms for which the session will remain valid
      * Any expiration duration under 0 will go to a default value
      */
-    fun create(user: User, role: String, expiresIn: Long = -1): Session?
+    fun create(user: User, role: Role, expiresIn: Long = -1): Session?
 
     /**
      * Deletes session by unique user key.
@@ -70,7 +70,7 @@ interface PrintJobRepository : Repository<Id, PrintJob> {
      * This acts as a placeholder, and holds nothing more than a unique id.
      * If a job is in the created state for a long time, it should eventually fail.
      */
-    fun create(user: User, printerGroup: Id): CreatedJob?
+    fun create(user: User, jobName: String, printerGroup: Id): CreatedJob?
 
     /**
      * Attempts to update a previously created job to the processed stage.

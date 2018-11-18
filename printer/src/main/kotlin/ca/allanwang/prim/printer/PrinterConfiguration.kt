@@ -1,8 +1,7 @@
 package ca.allanwang.prim.printer
 
-import ca.allanwang.prim.models.Flag
-import ca.allanwang.prim.models.Printer
-import ca.allanwang.prim.models.PrinterStatus
+import ca.allanwang.prim.models.*
+import java.io.File
 
 interface PrinterConfiguration {
 
@@ -17,7 +16,7 @@ interface PrinterConfiguration {
      * Note that further information concerning which printers to use is decided
      * by the queue manager, which is why the job info is not provided here.
      */
-    fun getCandidatePrinters(role: String, printers: List<Printer>): List<Printer>
+    fun getCandidatePrinters(role: Role, printers: List<Printer>): List<Printer>
 
     /**
      * Called to fetch a load balancer if the name is not recognized by the current implementations.
@@ -25,12 +24,35 @@ interface PrinterConfiguration {
      */
     fun createLoadBalancer(name: Flag): LoadBalancer
 
+    /**
+     * Given a processed job, return true if it should be printed.
+     * At this stage, everything has been verified on Prim's end.
+     * This is a good time to check for things like color printing or sufficient quota.
+     */
+    fun canPrint(printerId: Id, job: ProcessedJob): Validation
+
+    /**
+     * Temp directory that houses all the files for printing.
+     */
+    val tmpDir: File
+
+    fun print(job: PrintedJob)
+
 }
 
 class DefaultPrinterConfiguration : PrinterConfiguration {
 
-    override fun getCandidatePrinters(role: String, printers: List<Printer>): List<Printer> =
+    override fun getCandidatePrinters(role: Role, printers: List<Printer>): List<Printer> =
             printers.filter { it.flag == PrinterStatus.FLAG_ENABLED }
 
     override fun createLoadBalancer(name: Flag): LoadBalancer = LoadBalancer.fromName(LoadBalancer.DEFAULT)!!
+
+    override fun canPrint(printerId: Id, job: ProcessedJob): Validation = Valid
+
+    override val tmpDir: File = File("") // TODO pick better default
+
+    override fun print(job: PrintedJob) {
+        // TODO use slf4j
+        println("Printed ${job.jobName}")
+    }
 }

@@ -1,6 +1,7 @@
 package ca.allanwang.prim.printer.sql.repos
 
 import ca.allanwang.prim.models.Id
+import ca.allanwang.prim.models.Role
 import ca.allanwang.prim.models.Session
 import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
@@ -37,7 +38,7 @@ internal object SessionRepositorySql : SessionRepository,
             expiresAt = this[table.expiresAt].toDate()
     )
 
-    override fun create(user: User, role: String, expiresIn: Long): Session? = transaction {
+    override fun create(user: User, role: Role, expiresIn: Long): Session? = transaction {
         table.deleteWhere { (table.user eq user) and (table.role neq role) }
         transactionInsert(newId()) {
             it[this.user] = user

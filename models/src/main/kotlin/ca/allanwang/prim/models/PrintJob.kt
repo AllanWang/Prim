@@ -3,10 +3,11 @@ package ca.allanwang.prim.models
 import java.util.*
 
 data class PrintJobJson(
-        val flag: String,
-        val id: String,
-        val user: String,
-        val printerGroup: Id? = null,
+        val flag: Flag,
+        val id: Id,
+        val user: User,
+        val jobName: String,
+        val printerGroup: Id,
         val printer: Id? = null,
         val createdAt: Date? = null,
         val filePath: String? = null,
@@ -14,7 +15,7 @@ data class PrintJobJson(
         val totalPageCount: Int = 0,
         val colorPageCount: Int = 0,
         val finishedAt: Date? = null,
-        val errorFlag: String? = null,
+        val errorFlag: Flag? = null,
         val refunded: Boolean = false,
         val refunder: User? = null,
         val refundDate: Date? = null
@@ -27,13 +28,15 @@ data class PrintJobJson(
         PrintJob.CREATED -> CreatedJob(
                 id = id,
                 user = user,
-                printerGroup = printerGroup!!,
+                jobName = jobName,
+                printerGroup = printerGroup,
                 createdAt = createdAt!!
         )
         PrintJob.PROCESSED -> ProcessedJob(
                 id = id,
                 user = user,
-                printerGroup = printerGroup!!,
+                jobName = jobName,
+                printerGroup = printerGroup,
                 createdAt = createdAt!!,
                 filePath = filePath!!,
                 processedAt = processedAt!!,
@@ -43,7 +46,8 @@ data class PrintJobJson(
         PrintJob.PRINTED -> PrintedJob(
                 id = id,
                 user = user,
-                printerGroup = printerGroup!!,
+                jobName = jobName,
+                printerGroup = printerGroup,
                 printer = printer!!,
                 createdAt = createdAt!!,
                 filePath = filePath!!,
@@ -61,6 +65,8 @@ data class PrintJobJson(
         PrintJob.FAILED -> FailedJob(
                 id = id,
                 user = user,
+                jobName = jobName,
+                printerGroup = printerGroup,
                 printer = printer,
                 errorFlag = errorFlag!!,
                 finishedAt = finishedAt!!
@@ -81,6 +87,8 @@ data class PrintJobJson(
 sealed class PrintJob : SpecificModel<PrintJobJson> {
     abstract val id: Id
     abstract val user: User
+    abstract val jobName: String
+    abstract val printerGroup: Id
 
     companion object {
         const val CREATED = "created"
@@ -93,13 +101,15 @@ sealed class PrintJob : SpecificModel<PrintJobJson> {
 data class CreatedJob(
         override val id: Id,
         override val user: User,
-        val printerGroup: Id,
+        override val jobName: String,
+        override val printerGroup: Id,
         val createdAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
-            CREATED,
-            id,
-            user,
+            flag = CREATED,
+            id = id,
+            user = user,
+            jobName = jobName,
             printerGroup = printerGroup,
             createdAt = createdAt)
 }
@@ -107,7 +117,8 @@ data class CreatedJob(
 data class ProcessedJob(
         override val id: Id,
         override val user: User,
-        val printerGroup: Id,
+        override val jobName: String,
+        override val printerGroup: Id,
         val createdAt: Date,
         val filePath: String,
         val processedAt: Date,
@@ -115,9 +126,10 @@ data class ProcessedJob(
         val colorPageCount: Int
 ) : PrintJob() {
     override fun json() = PrintJobJson(
-            PROCESSED,
-            id,
-            user,
+            flag = PROCESSED,
+            id = id,
+            user = user,
+            jobName = jobName,
             printerGroup = printerGroup,
             createdAt = createdAt,
             filePath = filePath,
@@ -129,7 +141,8 @@ data class ProcessedJob(
 data class PrintedJob(
         override val id: Id,
         override val user: User,
-        val printerGroup: Id,
+        override val jobName: String,
+        override val printerGroup: Id,
         val createdAt: Date,
         val filePath: String?,
         val processedAt: Date,
@@ -143,9 +156,10 @@ data class PrintedJob(
     val isRefunded: Boolean get() = refund != null
 
     override fun json() = PrintJobJson(
-            PRINTED,
-            id,
-            user,
+            flag = PRINTED,
+            id = id,
+            user = user,
+            jobName = jobName,
             printerGroup = printerGroup,
             printer = printer,
             createdAt = createdAt,
@@ -162,17 +176,27 @@ data class PrintedJob(
 data class FailedJob(
         override val id: Id,
         override val user: User,
+        override val jobName: String,
+        override val printerGroup: Id,
         val printer: String?,
-        val errorFlag: String,
+        val errorFlag: Flag,
         val finishedAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
-            FAILED,
-            id,
-            user,
+            flag = FAILED,
+            id = id,
+            user = user,
+            jobName = jobName,
+            printerGroup = printerGroup,
             printer = printer,
             errorFlag = errorFlag,
             finishedAt = finishedAt)
+
+    companion object {
+        const val GENERIC = "generic"
+        const val NO_PRINTERS = "no_printers"
+        const val IO_FAILURE = "io_failure"
+    }
 }
 
 /**

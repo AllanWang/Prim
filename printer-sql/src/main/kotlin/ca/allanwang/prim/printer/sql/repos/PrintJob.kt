@@ -17,6 +17,8 @@ object PrintJobTable : IdTable<String>("print_job") {
     override val id = varchar("id", ID_SIZE).clientDefault(::newId).entityId()
     val flag = varchar("flag", FLAG_SIZE).default(PrintJob.CREATED)
     val user = varchar("user", USER_SIZE).uniqueIndex()
+    val jobName = varchar("job_name", ID_SIZE)
+    val printerGroup = varchar("printer_group", ID_SIZE)
     val filePath = varchar("file_path", ID_SIZE).nullable()
     val totalPageCount = integer("total_page_count").default(0)
     val colorPageCount = integer("color_page_count").default(0)
@@ -25,7 +27,6 @@ object PrintJobTable : IdTable<String>("print_job") {
     val finishedAt = datetime("finished_at").nullable()
     val errorFlag = varchar("error_flag", FLAG_SIZE).nullable()
     val printer = varchar("printer", ID_SIZE).nullable()
-    val printerGroup = varchar("printer_group", ID_SIZE).nullable()
 }
 
 object PrintJobRefundTable : IdTable<String>("print_job_refund") {
@@ -42,6 +43,8 @@ internal object PrintJobRepositorySql : PrintJobRepository,
             id = this[table.id].value,
             flag = this[table.flag],
             user = this[table.user],
+            jobName = this[table.jobName],
+            printerGroup = this[table.printerGroup],
             filePath = this[table.filePath],
             totalPageCount = this[table.totalPageCount],
             colorPageCount = this[table.colorPageCount],
@@ -50,7 +53,6 @@ internal object PrintJobRepositorySql : PrintJobRepository,
             finishedAt = this[table.finishedAt]?.toDate(),
             errorFlag = this[table.errorFlag],
             printer = this[table.printer],
-            printerGroup = this[table.printerGroup],
             refundDate = tryGet(PrintJobRefundTable.date)?.toDate(),
             refunded = tryGet(PrintJobRefundTable.refund) ?: false,
             refunder = tryGet(PrintJobRefundTable.refunder)
@@ -59,8 +61,9 @@ internal object PrintJobRepositorySql : PrintJobRepository,
     // TODO allow for multiple refunds and get the latest one only
     override fun retrieverFields(): FieldSet = table leftJoin PrintJobRefundTable
 
-    override fun create(user: User, printerGroup: Id): CreatedJob? = transactionInsert(newId()) {
+    override fun create(user: User, jobName: String, printerGroup: Id): CreatedJob? = transactionInsert(newId()) {
         it[this.flag] = PrintJob.CREATED
+        it[this.jobName] = jobName
         it[this.user] = user
         it[this.printerGroup] = printerGroup
     } as CreatedJob?
