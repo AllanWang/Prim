@@ -6,12 +6,13 @@ data class PrintJobJson(
         val flag: String,
         val id: String,
         val user: String,
+        val printerGroup: Id? = null,
+        val printer: Id? = null,
         val createdAt: Date? = null,
         val filePath: String? = null,
         val processedAt: Date? = null,
-        val pageCount: Int = 0,
+        val totalPageCount: Int = 0,
         val colorPageCount: Int = 0,
-        val printerGroup: String? = null,
         val finishedAt: Date? = null,
         val errorFlag: String? = null,
         val refunded: Boolean = false,
@@ -26,26 +27,29 @@ data class PrintJobJson(
         PrintJob.CREATED -> CreatedJob(
                 id = id,
                 user = user,
+                printerGroup = printerGroup!!,
                 createdAt = createdAt!!
         )
         PrintJob.PROCESSED -> ProcessedJob(
                 id = id,
                 user = user,
+                printerGroup = printerGroup!!,
                 createdAt = createdAt!!,
                 filePath = filePath!!,
                 processedAt = processedAt!!,
-                pageCount = pageCount,
+                totalPageCount = totalPageCount,
                 colorPageCount = colorPageCount
         )
         PrintJob.PRINTED -> PrintedJob(
                 id = id,
                 user = user,
+                printerGroup = printerGroup!!,
+                printer = printer!!,
                 createdAt = createdAt!!,
                 filePath = filePath!!,
                 processedAt = processedAt!!,
-                pageCount = pageCount,
+                totalPageCount = totalPageCount,
                 colorPageCount = colorPageCount,
-                printerGroup = printerGroup!!,
                 finishedAt = finishedAt!!,
                 refund = if (refunder != null
                         && refundDate != null)
@@ -57,6 +61,7 @@ data class PrintJobJson(
         PrintJob.FAILED -> FailedJob(
                 id = id,
                 user = user,
+                printer = printer,
                 errorFlag = errorFlag!!,
                 finishedAt = finishedAt!!
         )
@@ -88,45 +93,50 @@ sealed class PrintJob : SpecificModel<PrintJobJson> {
 data class CreatedJob(
         override val id: Id,
         override val user: User,
+        val printerGroup: Id,
         val createdAt: Date
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             CREATED,
             id,
             user,
+            printerGroup = printerGroup,
             createdAt = createdAt)
 }
 
 data class ProcessedJob(
         override val id: Id,
         override val user: User,
+        val printerGroup: Id,
         val createdAt: Date,
         val filePath: String,
         val processedAt: Date,
-        val pageCount: Int,
+        val totalPageCount: Int,
         val colorPageCount: Int
 ) : PrintJob() {
     override fun json() = PrintJobJson(
             PROCESSED,
             id,
             user,
+            printerGroup = printerGroup,
             createdAt = createdAt,
             filePath = filePath,
             processedAt = processedAt,
-            pageCount = pageCount,
+            totalPageCount = totalPageCount,
             colorPageCount = colorPageCount)
 }
 
 data class PrintedJob(
         override val id: Id,
         override val user: User,
+        val printerGroup: Id,
         val createdAt: Date,
         val filePath: String?,
         val processedAt: Date,
-        val pageCount: Int,
+        val totalPageCount: Int,
         val colorPageCount: Int,
-        val printerGroup: String,
         val finishedAt: Date,
+        val printer: Id,
         val refund: PrintRefund?
 ) : PrintJob() {
 
@@ -136,12 +146,13 @@ data class PrintedJob(
             PRINTED,
             id,
             user,
+            printerGroup = printerGroup,
+            printer = printer,
             createdAt = createdAt,
             filePath = filePath,
             processedAt = processedAt,
-            pageCount = pageCount,
+            totalPageCount = totalPageCount,
             colorPageCount = colorPageCount,
-            printerGroup = printerGroup,
             finishedAt = finishedAt,
             refunded = isRefunded,
             refunder = refund?.refunder,
@@ -151,6 +162,7 @@ data class PrintedJob(
 data class FailedJob(
         override val id: Id,
         override val user: User,
+        val printer: String?,
         val errorFlag: String,
         val finishedAt: Date
 ) : PrintJob() {
@@ -158,6 +170,7 @@ data class FailedJob(
             FAILED,
             id,
             user,
+            printer = printer,
             errorFlag = errorFlag,
             finishedAt = finishedAt)
 }

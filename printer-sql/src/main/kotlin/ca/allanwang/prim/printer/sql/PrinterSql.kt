@@ -30,8 +30,17 @@ internal const val NAME_SIZE = 64
 internal const val USER_SIZE = 64
 internal const val MESSAGE_SIZE = 255
 
+/**
+ * Base implementation of a repository, extended by sql queries.
+ * Given the structure, a lot of helper methods can be provided with just an id table.
+ */
 abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val table: T) : Repository<K, M> {
 
+    /**
+     * Converts a row into model [M].
+     * By default, the result will contain columns within [table].
+     * However, this may be overridden through [retrieverFields].
+     */
     protected abstract fun ResultRow.rowToModel(): M
 
     /**
@@ -49,7 +58,7 @@ abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val tab
     }
 
     override fun getList(limit: Int, offset: Int): List<M> = transaction {
-        retrieverFields().selectAll().map { it.rowToModel() }
+        retrieverFields().selectAll().limit(limit, offset).map { it.rowToModel() }
     }
 
     override fun count(): Int = transaction {
@@ -77,11 +86,15 @@ abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val tab
     /**
      * Checks if entry exists and returns null if it doesn't.
      * Otherwise, applies update, and returns the retrieved output.
+     * By default the query condition, [where], checks for key matching.
+     * It can be overridden to impose more constraints, though it should ultimately
+     * match at most one item in most cases.
      */
-    protected fun transactionSingleUpdate(key: K,
-                                          body: T.(UpdateStatement) -> Unit): M? = transaction {
-        if (table.select { table.id eq key }.count() == 0) return@transaction null
-        table.update({ table.id eq key }, body = body)
+    protected fun transactionUpdate(key: K,
+                                    where: SqlExpressionBuilder.() -> Op<Boolean> = { table.id eq key },
+                                    body: T.(UpdateStatement) -> Unit): M? = transaction {
+        if (table.select(where).count() == 0) return@transaction null
+        table.update(where, body = body)
         commit()
         getById(key)
     }

@@ -84,4 +84,16 @@ abstract class PrinterTestBase : TestBase() {
                 "All printers did not contain group1 data")
     }
 
+    @Test
+    fun `update group load balancer`() {
+        val group = createPrinterGroup(0)!!
+        assertTrue(group.loadBalancer.isNotEmpty(),
+                "Default load balancer should not be an empty key")
+        val updatedGroup = printerGroupRepository.updateLoadBalancer(group.id, group.loadBalancer.repeat(2))!!
+        assertNotEquals(group, updatedGroup,
+                "Updating load balancer did not change anything.")
+        assertEquals(group, updatedGroup.copy(loadBalancer = group.loadBalancer),
+                "Fields beyond load balancer changed when updating load balancer")
+    }
+
 }

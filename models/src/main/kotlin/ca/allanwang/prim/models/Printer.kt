@@ -71,5 +71,5 @@ data class PrinterStatus(
 data class PrinterGroup(
         val id: Id,
         val name: String,
-        val queueManager: Flag
+        val loadBalancer: Flag
 )

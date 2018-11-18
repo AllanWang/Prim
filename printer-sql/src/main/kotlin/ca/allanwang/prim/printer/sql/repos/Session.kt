@@ -40,9 +40,9 @@ internal object SessionRepositorySql : SessionRepository,
     override fun create(user: User, role: String, expiresIn: Long): Session? = transaction {
         table.deleteWhere { (table.user eq user) and (table.role neq role) }
         transactionInsert(newId()) {
-            it[table.user] = user
-            it[table.role] = role
-            it[table.expiresAt] = DateTime.now().plus(if (expiresIn > 0) expiresIn else DEFAULT_EXPIRATION_DURATION)
+            it[this.user] = user
+            it[this.role] = role
+            it[this.expiresAt] = DateTime.now().plus(if (expiresIn > 0) expiresIn else DEFAULT_EXPIRATION_DURATION)
         }
     }
 

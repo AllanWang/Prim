@@ -41,7 +41,7 @@ class JsonSpecificConversionTest {
                 id = "testId",
                 user = "testUser",
                 createdAt = Date(1),
-                pageCount = 1,
+                totalPageCount = 1,
                 colorPageCount = 2,
                 filePath = "filePath",
                 processedAt = Date(5)).verify()
@@ -50,7 +50,7 @@ class JsonSpecificConversionTest {
                 id = "testId",
                 user = "testUser",
                 createdAt = Date(1),
-                pageCount = 1,
+                totalPageCount = 1,
                 colorPageCount = 2,
                 filePath = "filePath",
                 processedAt = Date(5),

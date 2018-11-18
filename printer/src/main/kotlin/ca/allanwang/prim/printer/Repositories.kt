@@ -36,20 +36,6 @@ interface Repository<K : Comparable<K>, M : Any> {
 
 }
 
-/**
- * Repository with a default list output, without conditions.
- * Such lists can also be ordered.
- */
-interface OrderedListRepository<M : Any> {
-
-    /**
-     * Similar to [Repository.getList], though there is an additional order constraint.
-     * What the order means is dependent on the implementation.
-     */
-    fun getList(limit: Int = -1, offset: Int = 0, order: Order): List<M>
-
-}
-
 enum class Order {
     ASCENDING, DESCENDING
 }
@@ -77,6 +63,54 @@ interface SessionRepository : Repository<Id, Session> {
 
 }
 
+interface PrintJobRepository : Repository<Id, PrintJob> {
+
+    /**
+     * Generates a new print job for a user.
+     * This acts as a placeholder, and holds nothing more than a unique id.
+     * If a job is in the created state for a long time, it should eventually fail.
+     */
+    fun create(user: User, printerGroup: Id): CreatedJob?
+
+    /**
+     * Attempts to update a previously created job to the processed stage.
+     * This state will attach all the necessary info about the job to prepare its print process.
+     * Note that this should only apply to a job that already exists and is in the [PrintJob.CREATED] phase
+     */
+    fun updateProcessed(id: Id, filePath: String, totalPageCount: Int, colorPageCount: Int): ProcessedJob?
+
+    /**
+     * Attempts to update a previously processed job to the printed stage.
+     * This marks the job as complete, and will attach any remaining info.
+     * Note that this should only apply to a job that already exists and is in the [PrintJob.PROCESSED] phase.
+     */
+    fun updatePrinted(id: Id, printer: Id): PrintedJob?
+
+    /**
+     * Attempts to update an existing job to the failed stage.
+     * Note that this can be applied to a job from any state except for [PrintJob.PRINTED], as it is already a final stage.
+     */
+    fun updateFailed(id: Id, error: Flag): FailedJob?
+
+    /**
+     * Gets all the jobs specific to the provided printer id.
+     * [order] is based on print time.
+     */
+    fun getListByPrinterGroup(printerGroup: Id, limit: Int = -1, offset: Int = 0, order: Order = Order.DESCENDING): List<PrintJob>
+
+//    fun getListSortedByDate(limit: Int = -1, offset: Int = 0, order: Order = Order.DESCENDING): List<PrintedJob>
+
+//    fun getListSortedByName(limit: Int = -1, offset: Int = 0, order: Order = Order.ASCENDING): List<PrintedJob>
+
+    /**
+     * Attempts to update a previously printed job to the new refund status.
+     * Note that this should only apply to a job that already exists and is in the [PrintJob.PRINTED].
+     * If the printed job exists, it will be returned with the newest refund status.
+     */
+    fun updateRefundStatus(id: Id, refunder: User, refund: Boolean): PrintedJob?
+
+}
+
 interface PrinterRepository : Repository<Id, Printer> {
 
     /**
@@ -84,6 +118,8 @@ interface PrinterRepository : Repository<Id, Printer> {
      * [id] is a unique identifier for the printer.
      * [name] is the unique display name for the printer.
      * [group] is the group that the printer is a part of.
+     *
+     * TODO check if we want to take in [PrinterGroup] or just a String
      */
     fun create(id: Id, name: Name, group: PrinterGroup): Printer?
 
@@ -91,6 +127,15 @@ interface PrinterRepository : Repository<Id, Printer> {
      * Get a list of printers from the given group
      */
     fun getList(group: PrinterGroup): List<Printer>
+
+    /**
+     * Set the printer to the provided flags.
+     * Note that no checks are done about the previous state.
+     * Regardless of whether the flag has changed, the current data will represent
+     * the printer's state.
+     * If the printer exists, the new model will be returned.
+     */
+    fun updateStatus(id: Id, user: User, flag: Flag, message: String): Printer?
 
 }
 

@@ -4,6 +4,7 @@ import ca.allanwang.prim.models.*
 import ca.allanwang.prim.printer.PrinterGroupRepository
 import ca.allanwang.prim.printer.PrinterRepository
 import ca.allanwang.prim.printer.sql.*
+import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -42,7 +43,7 @@ internal object PrinterRepositorySql : PrinterRepository,
             statusMessage = tryGet(PrinterStatusTable.message)
     ).specific()
 
-    override fun retrieverFields(): FieldSet = (PrinterTable leftJoin PrinterStatusTable)
+    override fun retrieverFields(): FieldSet = table leftJoin PrinterStatusTable
 
     override fun getList(group: PrinterGroup): List<Printer> = transaction {
         (PrinterTable leftJoin PrinterStatusTable)
@@ -51,12 +52,22 @@ internal object PrinterRepositorySql : PrinterRepository,
     }
 
     override fun create(id: Id, name: Name, group: PrinterGroup): Printer? = transactionInsert(id) {
-        it[table.name] = name
-        it[table.group] = group.id
+        it[this.name] = name
+        it[this.group] = group.id
     }
 
-    override fun count(): Int = transaction {
-        PrinterTable.selectAll().count()
+    override fun updateStatus(id: Id, user: User, flag: Flag, message: String): Printer? = try {
+        transaction {
+            if (table.select { table.id eq id }.count() == 0) return@transaction null
+            PrinterStatusTable.insert {
+                it[this.id] = EntityID(id, this)
+                it[this.flag] = flag
+                it[this.message] = message
+            }
+            getById(id)
+        }
+    } catch (e: Exception) {
+        null
     }
 }
 
@@ -66,15 +77,15 @@ internal object PrinterGroupRepositorySql : PrinterGroupRepository,
     override fun ResultRow.rowToModel(): PrinterGroup = PrinterGroup(
             id = this[table.id].value,
             name = this[table.name],
-            queueManager = this[table.loadBalancer])
+            loadBalancer = this[table.loadBalancer])
 
     override fun create(id: Id, name: Name, loadBalancer: Flag): PrinterGroup? = transactionInsert(id) {
-        it[table.name] = name
-        it[table.loadBalancer] = loadBalancer
+        it[this.name] = name
+        it[this.loadBalancer] = loadBalancer
     }
 
-    override fun updateLoadBalancer(id: Id, loadBalancer: Flag): PrinterGroup? = transactionSingleUpdate(id) {
-        it[table.loadBalancer] = loadBalancer
+    override fun updateLoadBalancer(id: Id, loadBalancer: Flag): PrinterGroup? = transactionUpdate(id) {
+        it[this.loadBalancer] = loadBalancer
     }
 
     override fun getAllPrinters(): Map<PrinterGroup, List<Printer>> = transaction {
