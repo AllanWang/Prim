@@ -1,6 +1,5 @@
 package ca.allanwang.prim.printer.repos
 
-import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
 import org.koin.standalone.inject
 import kotlin.test.*

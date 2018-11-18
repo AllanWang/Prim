@@ -5,19 +5,19 @@ import ca.allanwang.prim.models.*
 /**
  * Basic repository interface, where we can get and delete items
  */
-interface Repository<M : Any> {
+interface Repository<K : Comparable<K>, M : Any> {
 
     /**
      * Gets a single item by its unique id.
      * Returns null if no item is found.
      */
-    fun getById(id: Id): M?
+    fun getById(id: K): M?
 
     /**
      * Deletes a single item by its unique id.
      * If the item is not found, then nothing happens.
      */
-    fun deleteById(id: Id)
+    fun deleteById(id: K)
 
     /**
      * Returns a list of items without any particular order.
@@ -54,8 +54,7 @@ enum class Order {
     ASCENDING, DESCENDING
 }
 
-interface SessionRepository :
-        Repository<Session> {
+interface SessionRepository : Repository<Id, Session> {
 
     /**
      * Creates a new session for the user and role
@@ -78,13 +77,15 @@ interface SessionRepository :
 
 }
 
-interface PrinterRepository :
-        Repository<Printer> {
+interface PrinterRepository : Repository<Id, Printer> {
 
     /**
-     * Creates a new printer with the provided [name] and [group].
+     * Creates a new printer with the provided parameters.
+     * [id] is a unique identifier for the printer.
+     * [name] is the unique display name for the printer.
+     * [group] is the group that the printer is a part of.
      */
-    fun create(name: String, group: PrinterGroup): Printer?
+    fun create(id: Id, name: Name, group: PrinterGroup): Printer?
 
     /**
      * Get a list of printers from the given group
@@ -93,14 +94,21 @@ interface PrinterRepository :
 
 }
 
-interface PrinterGroupRepository :
-        Repository<PrinterGroup> {
+interface PrinterGroupRepository : Repository<Id, PrinterGroup> {
 
     /**
-     * Creates a new printer group with the provided [name]
-     * and [queueManager]
+     * Creates a new printer group with the provided parameters.
+     * [id] is a unique identifier for the group
+     * [name] is the unique display name for the printer.
+     * [loadBalancer] is the name of the [LoadBalancer] to use.
      */
-    fun create(name: String, queueManager: Flag): PrinterGroup?
+    fun create(id: Id, name: Name, loadBalancer: Flag = LoadBalancer.DEFAULT): PrinterGroup?
+
+    /**
+     * Attempts to switch the load balancer of selected printer group to the new one.
+     * If successful, returns the printer group. Returns null otherwise.
+     */
+    fun updateLoadBalancer(id: Id, loadBalancer: Flag): PrinterGroup?
 
     /**
      * Retrieves a map of every printer group to its associated printers.

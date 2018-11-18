@@ -4,16 +4,17 @@ import ca.allanwang.prim.models.Id
 import ca.allanwang.prim.models.Session
 import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
-import ca.allanwang.prim.printer.sql.FLAG_SIZE
-import ca.allanwang.prim.printer.sql.ID_SIZE
-import ca.allanwang.prim.printer.sql.USER_SIZE
-import ca.allanwang.prim.printer.sql.newId
-import org.jetbrains.exposed.sql.*
+import ca.allanwang.prim.printer.newId
+import ca.allanwang.prim.printer.sql.*
+import org.jetbrains.exposed.dao.IdTable
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
-object SessionTable : Table("session") {
-    val id = varchar("id", ID_SIZE).primaryKey().clientDefault(::newId)
+object SessionTable : IdTable<String>("session") {
+    override val id = varchar("id", ID_SIZE).clientDefault(::newId).entityId()
     val user = varchar("user", USER_SIZE)
     val role = varchar("role", FLAG_SIZE)
     val createdAt = datetime("created_at").clientDefault(DateTime::now)
@@ -22,48 +23,32 @@ object SessionTable : Table("session") {
 
 private const val DEFAULT_EXPIRATION_DURATION = 1000 * 60 * 60 * 24 * 30L // a month
 
-internal object SessionRepositorySql : SessionRepository {
+internal object SessionRepositorySql : SessionRepository,
+        SqlRepository<Id, Session, SessionTable>(SessionTable) {
 
-    private fun ResultRow.toSession(): Session = Session(
-            id = this[SessionTable.id],
-            user = this[SessionTable.user],
-            role = this[SessionTable.role],
-            createdAt = this[SessionTable.createdAt].toDate(),
-            expiresAt = this[SessionTable.expiresAt].toDate()
+    override fun ResultRow.rowToModel(): Session = Session(
+            id = this[table.id].value,
+            user = this[table.user],
+            role = this[table.role],
+            createdAt = this[table.createdAt].toDate(),
+            expiresAt = this[table.expiresAt].toDate()
     )
 
-    override fun getById(id: Id): Session? = transaction {
-        SessionTable.select { SessionTable.id eq id }.firstOrNull()?.toSession()
-    }
-
-    override fun deleteById(id: Id): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.id eq id }
-    }
-
-    override fun getList(limit: Int, offset: Int): List<Session> = transaction {
-        SessionTable.selectAll().limit(limit, offset = offset).map { it.toSession() }.toList()
-    }
-
     override fun create(user: User, role: String, expiresIn: Long): Session? = transaction {
-        SessionTable.deleteWhere { (SessionTable.user eq user) and (SessionTable.role neq role) }
-        val id = SessionTable.insert {
-            it[SessionTable.user] = user
-            it[SessionTable.role] = role
-            it[SessionTable.expiresAt] = DateTime.now().plus(if (expiresIn > 0) expiresIn else DEFAULT_EXPIRATION_DURATION)
-        } get SessionTable.id ?: return@transaction null
-        getById(id)
+        table.deleteWhere { (table.user eq user) and (table.role neq role) }
+        transactionInsert {
+            it[table.user] = user
+            it[table.role] = role
+            it[table.expiresAt] = DateTime.now().plus(if (expiresIn > 0) expiresIn else DEFAULT_EXPIRATION_DURATION)
+        }
     }
 
     override fun deleteByUser(user: User): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.user eq user }
+        table.deleteWhere { table.user eq user }
     }
 
     override fun deleteExpired(): Unit = transaction {
-        SessionTable.deleteWhere { SessionTable.expiresAt lessEq DateTime.now() }
-    }
-
-    override fun count(): Int = transaction {
-        SessionTable.selectAll().count()
+        table.deleteWhere { table.expiresAt lessEq DateTime.now() }
     }
 
 }
