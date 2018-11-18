@@ -15,6 +15,7 @@ object QueueManager : KoinComponent {
 
     private val loadBalancers: MutableMap<Id, LoadBalancer> = ConcurrentHashMap()
 
+    // TODO make thread safe
     private fun loadBalancer(group: Id): LoadBalancer = loadBalancers.getOrElse(group) {
         val loadBalancer = LoadBalancer.fromName(group) ?: printerConfigs.createLoadBalancer(group)
         loadBalancers[group] = loadBalancer
@@ -45,6 +46,14 @@ object QueueManager : KoinComponent {
      */
     fun registerJob(printJob: PrintedJob) {
         loadBalancer(printJob.printerGroup).register(printJob)
+    }
+
+    fun resetLoadBalancer(group: Id) {
+        loadBalancers.remove(group)
+    }
+
+    fun resetLoadBalancers() {
+        loadBalancers.clear()
     }
 
 }
