@@ -4,7 +4,6 @@ import ca.allanwang.prim.models.*
 import ca.allanwang.prim.printer.PrinterGroupRepository
 import ca.allanwang.prim.printer.PrinterRepository
 import ca.allanwang.prim.printer.sql.*
-import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -25,13 +24,13 @@ object PrinterStatusTable : IdTable<String>("printer_status") {
 }
 
 object PrinterGroupTable : IdTable<String>("printer_group") {
-    override val id = varchar("id", ID_SIZE).entityId()
+    override val id = varchar("id", ID_SIZE).primaryKey().entityId()
     val name = varchar("name", NAME_SIZE).uniqueIndex()
     val loadBalancer = varchar("load_balancer", FLAG_SIZE)
 }
 
 internal object PrinterRepositorySql : PrinterRepository,
-        SqlRepository<Id, Printer, PrinterTable>(PrinterTable){
+        SqlRepository<Id, Printer, PrinterTable>(PrinterTable) {
 
     override fun ResultRow.rowToModel(): Printer = PrinterJson(
             id = this[table.id].value,

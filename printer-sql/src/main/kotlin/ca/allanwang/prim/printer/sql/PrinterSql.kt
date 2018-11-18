@@ -30,10 +30,6 @@ internal const val NAME_SIZE = 64
 internal const val USER_SIZE = 64
 internal const val MESSAGE_SIZE = 255
 
-abstract class PrimIdTable<K : Comparable<K>>(name: String) : Table(name) {
-    abstract val id: Column<K>
-}
-
 abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val table: T) : Repository<K, M> {
 
     protected abstract fun ResultRow.rowToModel(): M
@@ -60,18 +56,22 @@ abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val tab
         table.selectAll().count()
     }
 
-    protected fun transactionInsert(id: K, body: T.(InsertStatement<Number>) -> Unit): M? = transaction {
-        try {
+    /**
+     * Attempts to insert an item with the provided id. If successful, outputs the saved data.
+     * Note that the [body] should not contain any assignments to the id column.
+     *
+     * TODO pending on https://github.com/JetBrains/Exposed/issues/432
+     */
+    protected fun transactionInsert(id: K, body: T.(InsertStatement<Number>) -> Unit): M? = try {
+        transaction {
             table.insert {
                 body(it)
                 it[table.id] = EntityID(id, table)
             }
             getById(id)
-        } catch (e: Exception) {
-            // TODO remove
-            println("Error $e")
-            null
         }
+    } catch (e: Exception) {
+        null
     }
 
     /**
