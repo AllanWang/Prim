@@ -3,7 +3,11 @@ package ca.allanwang.prim.printer
 import ca.allanwang.prim.models.*
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
+import java.io.File
 import java.io.InputStream
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 object Prim : KoinComponent {
 
@@ -36,12 +40,29 @@ object Prim : KoinComponent {
         if (!tmpDir.exists() && !tmpDir.mkdirs())
             return fail(FailedJob.IO_FAILURE)
 
+        val file = File(tmpDir, "$jobId.ps")
+
+        try {
+            file.copyFrom(stream)
+        } catch (e: Exception) {
+            return fail(FailedJob.IO_FAILURE)
+        }
+
+        val processedJob = printJobRepository.updateProcessed(jobId, file.absolutePath, 0, 0)
+                ?: fail(FailedJob.DELETED_JOB)
+
         TODO()
     }
 
     fun print(job: PrintedJob) {
         // Check that file exists and is postscript
         // Send to printer
+    }
+
+    private fun File.copyFrom(input: InputStream, vararg options: CopyOption = arrayOf(StandardCopyOption.REPLACE_EXISTING)) {
+        input.use {
+            Files.copy(it, toPath(), *options)
+        }
     }
 
 }

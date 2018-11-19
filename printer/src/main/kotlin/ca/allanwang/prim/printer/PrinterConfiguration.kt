@@ -2,6 +2,9 @@ package ca.allanwang.prim.printer
 
 import ca.allanwang.prim.models.*
 import java.io.File
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 interface PrinterConfiguration {
 
@@ -38,6 +41,12 @@ interface PrinterConfiguration {
 
     fun print(job: PrintedJob)
 
+    /**
+     * Decompresses the given input stream.
+     * This should do the opposite of whatever compression was used when receiving the file.
+     */
+    fun decompress(stream: InputStream): InputStream = stream
+
 }
 
 class DefaultPrinterConfiguration : PrinterConfiguration {
@@ -55,4 +64,5 @@ class DefaultPrinterConfiguration : PrinterConfiguration {
         // TODO use slf4j
         println("Printed ${job.jobName}")
     }
+
 }

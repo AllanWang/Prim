@@ -114,6 +114,8 @@ data class CreatedJob(
             createdAt = createdAt)
 }
 
+// TODO add ReceivedJob; getting filePath is separate from getting actual file info
+
 data class ProcessedJob(
         override val id: Id,
         override val user: User,
@@ -196,6 +198,7 @@ data class FailedJob(
         const val GENERIC = "generic"
         const val NO_PRINTERS = "no_printers"
         const val IO_FAILURE = "io_failure"
+        const val DELETED_JOB = "deleted_job"
     }
 }
 
