@@ -3,13 +3,17 @@ package ca.allanwang.prim.models
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+interface IdModel<T : Comparable<T>> {
+    val id: T
+}
+
 /**
  * General response for executing requests
  */
 data class GeneralResponse(
         val ok: Boolean,
-        val id: Id
-)
+        override val id: Id
+) : IdModel<Id>
 
 /**
  * General error response

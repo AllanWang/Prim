@@ -11,8 +11,8 @@ import java.util.*
  */
 data class Session(
         val user: User,
-        val id: Id,
+        override val id: Id,
         val role: Role,
         val createdAt: Date,
         val expiresAt: Date
-)
+) : IdModel<Id>

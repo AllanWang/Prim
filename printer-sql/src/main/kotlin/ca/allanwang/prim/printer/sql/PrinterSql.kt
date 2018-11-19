@@ -1,5 +1,6 @@
 package ca.allanwang.prim.printer.sql
 
+import ca.allanwang.prim.models.IdModel
 import ca.allanwang.prim.printer.*
 import ca.allanwang.prim.printer.sql.repos.PrintJobRepositorySql
 import ca.allanwang.prim.printer.sql.repos.PrinterGroupRepositorySql
@@ -33,7 +34,7 @@ internal const val MESSAGE_SIZE = 255
  * Base implementation of a repository, extended by sql queries.
  * Given the structure, a lot of helper methods can be provided with just an id table.
  */
-abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val table: T) : Repository<K, M> {
+abstract class SqlRepository<K : Comparable<K>, M : IdModel<K>, T : IdTable<K>>(val table: T) : Repository<K, M> {
 
     /**
      * Converts a row into model [M].
@@ -57,7 +58,10 @@ abstract class SqlRepository<K : Comparable<K>, M : Any, T : IdTable<K>>(val tab
     }
 
     override fun getList(limit: Int, offset: Int): List<M> = transaction {
-        retrieverFields().selectAll().limit(limit, offset).map { it.rowToModel() }
+        retrieverFields().selectAll()
+                .orderBy(table.id to SortOrder.ASC)
+                .limit(limit, offset)
+                .map { it.rowToModel() }
     }
 
     override fun count(): Int = transaction {

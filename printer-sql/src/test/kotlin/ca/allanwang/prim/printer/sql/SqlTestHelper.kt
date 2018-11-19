@@ -1,5 +1,7 @@
 package ca.allanwang.prim.printer.sql
 
+import ca.allanwang.prim.models.IdModel
+import ca.allanwang.prim.printer.Repository
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
@@ -12,6 +14,8 @@ import org.junit.jupiter.api.extension.BeforeTestExecutionCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.koin.dsl.module.Module
 import org.koin.standalone.StandAloneContext.startKoin
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Extension that binds additional koin modules and sql tables for each test.
@@ -44,4 +48,33 @@ open class SqlExtension(tables: List<Table>,
         }
     }
 
+}
+
+/**
+ * Checks that list retrieval from db is properly sorted.
+ * [comparator] is used to define the expected list order.
+ * [getter] is used to retrieve the list from the db.
+ * [addData] is used to add the items to the repo. It also returns a list,
+ * which is our expected content. This list does not have to be sorted.
+ * For default id check, use [assertListSortedById].
+ */
+fun <ID : Comparable<ID>,
+        M : IdModel<ID>,
+        R : Repository<ID, M>> assertListSorted(repo: R,
+                                                comparator: Comparator<in M>,
+                                                getter: R.() -> List<M>,
+                                                addData: R.() -> List<M>) {
+    val expectedContent = repo.addData()
+    val list = repo.getter()
+    assertTrue(list.size > 1, "Sort for ${repo::class.simpleName} checker has less than two items")
+    assertEquals(expectedContent.sortedWith(comparator), list,
+            "List of ${repo::class.simpleName} not sorted properly")
+}
+
+fun <ID : Comparable<ID>,
+        M : IdModel<ID>,
+        R : Repository<ID, M>> assertListSortedById(repo: R, creator: (Int) -> M) {
+    assertListSorted(repo, compareBy { it.id }, { getList() }) {
+        listOf(6, 3, 7, 4, 78, 1).map(creator)
+    }
 }

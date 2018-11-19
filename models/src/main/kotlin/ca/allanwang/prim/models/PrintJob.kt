@@ -4,7 +4,7 @@ import java.util.*
 
 data class PrintJobJson(
         val flag: Flag,
-        val id: Id,
+        override val id: Id,
         val user: User,
         val jobName: String,
         val printerGroup: Id,
@@ -19,7 +19,7 @@ data class PrintJobJson(
         val refunded: Boolean = false,
         val refunder: User? = null,
         val refundDate: Date? = null
-) : JsonModel<PrintJob> {
+) : IdModel<Id>, JsonModel<PrintJob> {
     /**
      * Converts json model to one of the sealed [PrintJob] classes.
      * Opposite of [PrintJob.json]
@@ -84,8 +84,8 @@ data class PrintJobJson(
  *
  * In a given lifecycle, a print job is expected to eventually end up as printed or failed
  */
-sealed class PrintJob : SpecificModel<PrintJobJson> {
-    abstract val id: Id
+sealed class PrintJob : IdModel<Id>, SpecificModel<PrintJobJson> {
+    abstract override val id: Id
     abstract val user: User
     abstract val jobName: String
     abstract val printerGroup: Id

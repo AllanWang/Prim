@@ -3,14 +3,14 @@ package ca.allanwang.prim.models
 import java.util.*
 
 data class PrinterJson(
-        val id: Id,
+        override val id: Id,
         val name: Name,
         val groupId: Id,
         val flag: Flag,
         val statusUser: User? = null,
         val statusDate: Date? = null,
         val statusMessage: String? = null
-) : JsonModel<Printer> {
+) : IdModel<Id>, JsonModel<Printer> {
     override fun specific(): Printer = Printer(
             id = id,
             name = name,
@@ -31,11 +31,11 @@ data class PrinterJson(
  * [name] is the human readable version, and should typically also be unique.
  */
 data class Printer(
-        val id: Id,
+        override val id: Id,
         val name: Name,
         val groupId: Id,
         val status: PrinterStatus?
-) : SpecificModel<PrinterJson> {
+) : IdModel<Id>, SpecificModel<PrinterJson> {
 
     val flag: Flag get() = status?.flag ?: PrinterStatus.FLAG_DISABLED
 
@@ -69,7 +69,17 @@ data class PrinterStatus(
 }
 
 data class PrinterGroup(
-        val id: Id,
+        override val id: Id,
         val name: Name,
         val loadBalancer: Flag
+) : IdModel<Id>
+
+/**
+ * Printer group along with its associated printers.
+ * Note that the list should be sorted in ascending order by id.
+ * This ensures that each printer group is equal by data.
+ */
+data class PrinterGroupFull(
+        val group: PrinterGroup,
+        val printers: List<Printer>
 )

@@ -26,6 +26,9 @@ interface Repository<K : Comparable<K>, M : Any> {
      * [limit] specifies the upper bound for the number of items to return when it is positive.
      * [offset] specifies the start index of the returned list relative to the full list;
      * this is useful for pagination.
+     *
+     * By default, the lists should be returned and sorted by id in ascending order
+     * for consistency.
      */
     fun getList(limit: Int = -1, offset: Int = 0): List<M>
 
@@ -117,11 +120,9 @@ interface PrinterRepository : Repository<Id, Printer> {
      * Creates a new printer with the provided parameters.
      * [id] is a unique identifier for the printer.
      * [name] is the unique display name for the printer.
-     * [group] is the group that the printer is a part of.
-     *
-     * TODO check if we want to take in [PrinterGroup] or just a String
+     * [groupId] is the groupId that the printer is a part of.
      */
-    fun create(id: Id, name: Name, group: PrinterGroup): Printer?
+    fun create(id: Id, name: Name, groupId: Id): Printer?
 
     /**
      * Get a list of printers from the given group
@@ -165,6 +166,6 @@ interface PrinterGroupRepository : Repository<Id, PrinterGroup> {
      * Given a group id, attempt to get the associated group
      * and its printers.
      */
-    fun getPrinters(group: Id): Pair<PrinterGroup, List<Printer>>?
+    fun getPrinters(group: Id): PrinterGroupFull?
 
 }

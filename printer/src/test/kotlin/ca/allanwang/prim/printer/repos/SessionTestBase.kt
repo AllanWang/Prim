@@ -53,4 +53,11 @@ abstract class SessionTestBase : TestBase() {
                 "No expiration default exists; if negative value is passed, the session should have some positive validity duration")
     }
 
+    @Test
+    fun `default list sort`() {
+        assertListSortedById(sessionRepository) {
+            createSession(it)!!
+        }
+    }
+
 }

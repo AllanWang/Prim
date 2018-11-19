@@ -23,7 +23,7 @@ object QueueManager : KoinComponent {
      */
     fun hasPrinters(group: Id, role: Role): Boolean {
         val groupInfo = printerGroupRepository.getPrinters(group) ?: return false
-        return printerConfigs.getCandidatePrinters(role, groupInfo.second).isNotEmpty()
+        return printerConfigs.getCandidatePrinters(role, groupInfo.printers).isNotEmpty()
     }
 
     /**
@@ -32,13 +32,13 @@ object QueueManager : KoinComponent {
      */
     fun getPrinter(group: Id, role: Role, printJob: ProcessedJob): Id? {
         val groupInfo = printerGroupRepository.getPrinters(group) ?: return null
-        val printers = groupInfo.second
+        val printers = groupInfo.printers
         return when (printers.size) {
             0 -> null
             1 -> printers.first().id
             else -> {
                 val candidates = printerConfigs.getCandidatePrinters(role, printers)
-                loadBalancer(groupInfo.first.loadBalancer)
+                loadBalancer(groupInfo.group.loadBalancer)
                         .select(candidates.map { it.id }.sorted(), printJob)
             }
         }

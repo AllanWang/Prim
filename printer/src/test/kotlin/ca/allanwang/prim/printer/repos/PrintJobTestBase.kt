@@ -116,6 +116,13 @@ abstract class PrintJobTestBase : TestBase() {
         }
     }
 
+    @Test
+    fun `default list sort`() {
+        assertListSortedById(printJobRepository) {
+            createPrintJob(it)!!
+        }
+    }
+
     /*
      * -------------------------------------------------------------------
      * Additional helpers
