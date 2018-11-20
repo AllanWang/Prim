@@ -10,12 +10,11 @@ import org.koin.test.KoinTest
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@ExtendWith(KoinTestExtension::class)
+@ExtendWith(StopKoinExtension::class)
 abstract class TestBase : KoinTest
 
-class KoinTestExtension : AfterEachCallback {
+class StopKoinExtension : AfterEachCallback {
     override fun afterEach(context: ExtensionContext) {
-        println("Stop koin")
         stopKoin()
     }
 }

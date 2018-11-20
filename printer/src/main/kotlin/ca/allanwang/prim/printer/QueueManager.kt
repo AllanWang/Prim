@@ -1,6 +1,9 @@
 package ca.allanwang.prim.printer
 
-import ca.allanwang.prim.models.*
+import ca.allanwang.prim.models.Id
+import ca.allanwang.prim.models.PrintedJob
+import ca.allanwang.prim.models.ProcessedJob
+import ca.allanwang.prim.models.Role
 import org.koin.standalone.KoinComponent
 import org.koin.standalone.inject
 

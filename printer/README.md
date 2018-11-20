@@ -32,3 +32,15 @@ In some cases, you may need to make more repositories to expose more methods for
 The benefit here is that all the main logic and tests are written for you. 
 You are free to add more tests in your own class on top of the existing ones.
 See the [sql tests](https://github.com/AllanWang/Prim/tree/master/printer-sql/src/test/kotlin/ca/allanwang/prim/printer/sql/repos) for an example.
+
+## Test Suite Format
+
+The following is the general test format for each [Repo]
+
+* TestBase - Basic shared parent for all test suites.
+* [Repo]TestHelperBase - Koin injections and helper methods.
+    * In most cases, there are `create` methods that associate model creations with a single int id input.
+    All fields are unique with unique id inputs, though fields can be overridden.
+    This helps simplify the testing process.
+* [Repo]TestBase - Collection of tests specific to the injected repos.
+If you wish to test your repo implementations, extend this class.

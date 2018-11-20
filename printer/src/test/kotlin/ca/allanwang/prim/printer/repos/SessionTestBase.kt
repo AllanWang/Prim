@@ -5,6 +5,7 @@ import ca.allanwang.prim.models.Session
 import ca.allanwang.prim.models.User
 import ca.allanwang.prim.printer.SessionRepository
 import org.koin.standalone.inject
+import java.util.*
 import kotlin.test.*
 
 /**
@@ -12,16 +13,7 @@ import kotlin.test.*
  * Required koins:
  * - [SessionRepository]
  */
-abstract class SessionTestBase : TestBase() {
-
-    val sessionRepository: SessionRepository by inject()
-
-    fun createSession(key: Int = 0,
-                      user: User = "testUser$key",
-                      role: Role = "testRole$key",
-                      expiresIn: Long = 1000000) =
-            sessionRepository.create(user = user, role = role, expiresIn = expiresIn)
-
+abstract class SessionTestBase : SessionTestHelperBase() {
 
     @Test
     fun `create and get`() {
@@ -60,4 +52,25 @@ abstract class SessionTestBase : TestBase() {
         }
     }
 
+}
+
+abstract class SessionTestHelperBase : TestBase() {
+
+    val sessionRepository: SessionRepository by inject()
+
+    fun createSession(key: Int = 0,
+                      user: User = "testUser$key",
+                      role: Role = "testRole$key",
+                      expiresIn: Long = 1000000) =
+            sessionRepository.create(user = user, role = role, expiresIn = expiresIn)
+
+    @Test
+    fun `verify test create session`() {
+        val before = System.currentTimeMillis()
+        val session = createSession(2)!!
+        val after = System.currentTimeMillis()
+        assertEquals("testUser2", session.user)
+        assertEquals("testRole2", session.role)
+        assertTrue(session.expiresAt.time - 100000 in (before..after))
+    }
 }

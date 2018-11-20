@@ -15,43 +15,12 @@ import kotlin.test.assertNull
  * - [PrintJobRepository]
  * - [PrintJobTestRepository]
  */
-abstract class PrintJobTestBase : TestBase() {
-
-    val printJobRepository: PrintJobRepository by inject()
-    val printJobTestRepository: PrintJobTestRepository by inject()
-
-    fun createPrintJob(key: Int = 0,
-                       user: User = "testUser$key",
-                       jobName: String = "job$key",
-                       printGroup: Id = "testGroup$key") =
-            printJobRepository.create(user = user, jobName = jobName, printerGroup = printGroup)
+abstract class PrintJobTestBase : PrintJobTestHelperBase() {
 
     @Test
     fun `basic creation`() {
         val job = createPrintJob(0)!!.json()
         assertEquals(PrintJob.CREATED, job.flag)
-    }
-
-    /**
-     * A series of tests to make sure that [PrintJobTestRepository.save]
-     * works as expected.
-     */
-    @Test
-    fun `test module check`() {
-        val created = createPrintJob(0)!!
-        val id = created.id
-
-        fun <T : PrintJob> T.assertSave(): T {
-            val tag = this::class.simpleName
-            save()
-            assertEquals(this, printJobRepository.getById(id),
-                    "$tag test save failed")
-            return this
-        }
-
-        created.toProcessed().assertSave()
-                .toPrinted().assertSave()
-                .fail().assertSave()
     }
 
     /**
@@ -123,13 +92,27 @@ abstract class PrintJobTestBase : TestBase() {
         }
     }
 
-    /*
-     * -------------------------------------------------------------------
-     * Additional helpers
-     * -------------------------------------------------------------------
-     */
+}
 
-    fun PrintJob.save() = printJobTestRepository.save(this)
+interface PrintJobTestRepository {
+
+    /**
+     * Test method to insert or update a print job.
+     * Do not add any safety checks.
+     */
+    fun save(job: PrintJob)
+
+}
+
+abstract class PrintJobTestHelperBase : TestBase() {
+    val printJobRepository: PrintJobRepository by inject()
+    val printJobTestRepository: PrintJobTestRepository by inject()
+
+    fun createPrintJob(key: Int = 0,
+                       user: User = "testUser$key",
+                       jobName: String = "job$key",
+                       printGroup: Id = "testGroup$key") =
+            printJobRepository.create(user = user, jobName = jobName, printerGroup = printGroup)
 
     fun PrintJob.fail(): FailedJob = json().copy(
             flag = PrintJob.FAILED,
@@ -163,6 +146,30 @@ abstract class PrintJobTestBase : TestBase() {
             refund = null
     )
 
+    fun PrintJob.save() = printJobTestRepository.save(this)
+
+    /**
+     * A series of tests to make sure that [PrintJobTestRepository.save]
+     * works as expected.
+     */
+    @Test
+    fun `test save check`() {
+        val created = createPrintJob(0)!!
+        val id = created.id
+
+        fun <T : PrintJob> T.assertSave(): T {
+            val tag = this::class.simpleName
+            save()
+            assertEquals(this, printJobRepository.getById(id),
+                    "$tag test save failed")
+            return this
+        }
+
+        created.toProcessed().assertSave()
+                .toPrinted().assertSave()
+                .fail().assertSave()
+    }
+
     /**
      * Helper to ensure that job updates do not apply to incorrect stages.
      * For each supplied job, we will save it, attempt to update it, and make sure the update both returns null
@@ -178,15 +185,4 @@ abstract class PrintJobTestBase : TestBase() {
             assertEquals(job, printJobRepository.getById(job.id), "invalid update from $from to $to ended up modifying data")
         }
     }
-
-}
-
-interface PrintJobTestRepository {
-
-    /**
-     * Test method to insert or update a print job.
-     * Do not add any safety checks.
-     */
-    fun save(job: PrintJob)
-
 }

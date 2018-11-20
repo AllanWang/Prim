@@ -12,22 +12,7 @@ import kotlin.test.*
  * - [PrinterRepository]
  * - [PrinterGroupRepository]
  */
-abstract class PrinterTestBase : TestBase() {
-
-    val printerRepository: PrinterRepository by inject()
-    val printerGroupRepository: PrinterGroupRepository by inject()
-
-    fun createPrinter(key: Int = 0,
-                      id: Id = "testId$key",
-                      name: Name = "testName$key",
-                      groupId: Id = "group$key") =
-            printerRepository.create(id = id, name = name, groupId = groupId)
-
-    fun createPrinterGroup(key: Int = 0,
-                           id: Id = "testGroupId$key",
-                           name: Name = "testGroupName$key",
-                           queueManager: String = "testQueueManager$key") =
-            printerGroupRepository.create(id = id, name = name, loadBalancer = queueManager)
+abstract class PrinterTestBase : PrinterTestHelperBase() {
 
     @Test
     fun `basic group creation`() {
@@ -88,4 +73,25 @@ abstract class PrinterTestBase : TestBase() {
         }
     }
 
+}
+
+/**
+ * Helper methods and validation tests
+ */
+abstract class PrinterTestHelperBase : TestBase() {
+
+    val printerRepository: PrinterRepository by inject()
+    val printerGroupRepository: PrinterGroupRepository by inject()
+
+    fun createPrinter(key: Int = 0,
+                      id: Id = "testId$key",
+                      name: Name = "testName$key",
+                      groupId: Id = "group$key") =
+            printerRepository.create(id = id, name = name, groupId = groupId)
+
+    fun createPrinterGroup(key: Int = 0,
+                           id: Id = "testGroupId$key",
+                           name: Name = "testGroupName$key",
+                           queueManager: String = "testQueueManager$key") =
+            printerGroupRepository.create(id = id, name = name, loadBalancer = queueManager)
 }

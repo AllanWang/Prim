@@ -3,8 +3,6 @@ package ca.allanwang.prim.printer
 import ca.allanwang.prim.models.*
 import java.io.File
 import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 
 interface PrinterConfiguration {
 
